@@ -1,18 +1,113 @@
 aid: bioaegis-therapeutics
 name: BioAegis Therapeutics
-description: 'BioAegis Therapeutics is a company surfaced via the API Evangelist harvest backlog (source:
-  secondary-market) and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  BioAegis Therapeutics, Inc. is a privately held, clinical-stage biopharmaceutical company
+  headquartered at the NJ Bioscience Center in North Brunswick, New Jersey. Founded in 2011 around
+  the discovery work of the late Dr. Thomas P. Stossel at Harvard Medical School and Brigham and
+  Women's Hospital, the company develops recombinant human plasma gelsolin (rhu-pGSN) — a protein
+  replacement therapy built on plasma gelsolin (pGSN), an abundant naturally occurring human blood
+  protein that acts as a master regulator of the innate immune response by keeping inflammation
+  localized to the site of injury and boosting the body's ability to clear pathogens. Its lead
+  programme, BTI-203, is a 600-patient, 75-site, 13-country randomized double-blind
+  placebo-controlled Phase 2 study of rhu-pGSN in moderate-to-severe acute respiratory distress
+  syndrome (ARDS), supported by a $20M BARDA DRIVe contract (75A50123C00067); a second Phase 2
+  programme targets inflammasome-driven decompression sickness under a U.S. Navy Office of Naval
+  Research contract with the University of Maryland School of Medicine. The FDA has granted Fast
+  Track designation for both ARDS and DCS indications. BioAegis holds an exclusive worldwide
+  license from Brigham and Women's Hospital and more than 40 issued patents spanning inflammatory
+  disease, infection, renal failure, neurologic disease and frailty. BioAegis Therapeutics runs no
+  developer program and publishes no product API, developer portal or API documentation. The only
+  machine-readable surface reachable without credentials is the WordPress REST content API behind
+  www.bioaegistherapeutics.com, catalogued here.
+image: https://www.bioaegistherapeutics.com/wp-content/uploads/2020/08/cropped-BioAegis_Basics_white_therapeutics_scaled_with_trademark.webp
 url: https://raw.githubusercontent.com/api-evangelist/bioaegis-therapeutics/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enriched
 specificationVersion: '0.20'
 created: '2026-08-07'
 modified: '2026-08-07'
 tags:
 - Company
-apis: []
+- biopharmaceuticals
+- biotechnology
+- clinical-trials
+- immunology
+- inflammation
+- innate-immunity
+- gelsolin
+- protein-therapeutics
+- ards
+- critical-care
+- rare-disease
+- drug-development
+- life-sciences
+- content-api
+apis:
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-content-api
+  name: BioAegis Therapeutics Content API
+  description: >-
+    The anonymously readable WordPress REST API behind www.bioaegistherapeutics.com. It exposes the
+    153 published posts (94 News press releases, 34 Publications, 9 Events, 6 Clinical Advisory
+    Board profiles, 5 Leadership profiles, 4 Board profiles and 2 Feature entries), the 14
+    corporate pages (Home, About Us, Our Science, Our Platform, BTI-203 Clinical Trial, FAQs,
+    Publications, News, Careers, Contact Us, Expanded Access Policy, Code of Ethics/Conduct, Terms
+    of Use, Privacy Policy), the 247-item media library, the 10 registered categories, the post
+    types, taxonomies and statuses, cross-content search, the oEmbed 1.0 provider endpoint, and the
+    Yoast SEO head renderer that carries the site's schema.org JSON-LD graph. Unlike many WordPress
+    corporate sites, `content.rendered` and `excerpt.rendered` ARE populated on both posts and
+    pages, so this surface yields full prose as well as identity, hierarchy, dates and SEO
+    metadata. Two things a consumer must know. First, the site is fronted by a Sucuri CloudProxy
+    WAF: /wp/v2/users returns a 403 HTML interstitial from the edge rather than a JSON error, so
+    author identities are not resolvable and `author` on every record is an unresolvable integer.
+    Second, the `post_tag` taxonomy is registered but empty (0 terms) — all classification is
+    carried by the hierarchical `category` taxonomy. This is not a developer product BioAegis
+    Therapeutics markets; it is the site's own content surface, registered at /wp-json/ and
+    verified to return data without credentials. The OpenAPI in this repo is derived from the
+    published route index and covers only the operations that were confirmed to answer anonymously.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - content
+  - wordpress
+  - corporate
+  - media
+  - press-releases
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-content-openapi.yml
+  - type: Overlay
+    url: overlays/bioaegis-therapeutics-content-overlay.yaml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+  x-contract-provenance: >-
+    Derived by the API Evangelist enrichment pipeline from the WordPress REST route index the site
+    publishes at https://www.bioaegistherapeutics.com/wp-json/ — 308 routes across the namespaces
+    oembed/1.0, redirection/v1, yoast/v1, elementor-one/v1, duplicate-post/v1, elementor/v1,
+    elementor-pro/v1, monsterinsights/v1, astra/v1, elementor/v1/documents, elementor-ai/v1,
+    elementor/v1/feedback, nps-survey/v1, wp/v2, wp-site-health/v1, wp-block-editor/v1 and
+    wp-abilities/v1 — and verified against live anonymous responses on 2026-08-07. Only the 23
+    operations that returned data without credentials are modelled. Notably the site registers the
+    WordPress Abilities API (`wp-abilities/v1`), an agent-facing capability registry, but
+    /wp-abilities/v1/abilities and /wp-abilities/v1/categories both return 401 rest_forbidden
+    anonymously, so no agent surface is claimed here. /wp/v2/users and /wp/v2/users/me return 403
+    from the Sucuri WAF, /wp/v2/settings returns 401 rest_forbidden, and themes, plugins, menus,
+    menu-locations, sidebars, widget-types, templates, template-parts, global-styles, block-types,
+    block-patterns, pattern-directory, font-collections, revisions and the oEmbed proxy all return
+    401. /wp/v2/comments, /wp/v2/tags, /wp/v2/blocks and /wp/v2/navigation return 200 with empty
+    collections. BioAegis Therapeutics publishes no developer documentation, no API reference, no
+    getting-started guide and no support channel for this surface, so no
+    Documentation/APIReference/GettingStarted pointers are emitted; the humanURL above is the
+    upstream WordPress REST handbook that defines the wp/v2 contract.
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -20,4 +115,71 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
+  url: https://www.bioaegistherapeutics.com/
+- type: About
+  url: https://www.bioaegistherapeutics.com/about-us/
+- type: Science
+  url: https://www.bioaegistherapeutics.com/our-science/
+- type: Platform
+  url: https://www.bioaegistherapeutics.com/our-platform/
+- type: ClinicalTrial
+  url: https://www.bioaegistherapeutics.com/bti-203-clinical-trial/
+- type: Publications
+  url: https://www.bioaegistherapeutics.com/publications-plasma-gelsolin/
+- type: FAQ
+  url: https://www.bioaegistherapeutics.com/faqs/
+- type: News
+  url: https://www.bioaegistherapeutics.com/news-plasma-gelsolin/
+- type: BlogRSS
+  url: https://www.bioaegistherapeutics.com/feed/
+- type: Careers
+  url: https://www.bioaegistherapeutics.com/careers/
+- type: Contact
+  url: https://www.bioaegistherapeutics.com/contact-us/
+- type: Support
+  url: https://www.bioaegistherapeutics.com/contact-us/
+- type: ExpandedAccess
+  url: https://www.bioaegistherapeutics.com/expanded-access-policy/
+- type: CodeOfConduct
+  url: https://www.bioaegistherapeutics.com/code-of-ethics-conduct/
+- type: TermsOfService
+  url: https://www.bioaegistherapeutics.com/terms-of-use/
+- type: PrivacyPolicy
+  url: https://www.bioaegistherapeutics.com/privacy-policy/
+- type: LinkedIn
+  url: https://www.linkedin.com/company/bioaegis-therapeutics
+- type: Twitter
+  url: https://twitter.com/bioaegis
+- type: YouTube
+  url: https://www.youtube.com/channel/UC9AflH4d_CL1TZLTBwb21HA
+- type: Sitemap
+  url: https://www.bioaegistherapeutics.com/sitemap_index.xml
+- type: SecondaryMarket
   url: https://www.nasdaqprivatemarket.com/
+- type: Authentication
+  url: authentication/bioaegis-therapeutics-authentication.yml
+- type: Conventions
+  url: conventions/bioaegis-therapeutics-conventions.yml
+- type: Conformance
+  url: conformance/bioaegis-therapeutics-conformance.yml
+- type: ErrorCatalog
+  url: errors/bioaegis-therapeutics-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/bioaegis-therapeutics-lifecycle.yml
+- type: DataModel
+  url: data-model/bioaegis-therapeutics-data-model.yml
+- type: JSONLD
+  url: json-ld/bioaegis-therapeutics-json-ld.yml
+- type: WellKnown
+  url: well-known/bioaegis-therapeutics-well-known.yml
+- type: DomainSecurity
+  url: security/bioaegis-therapeutics-domain-security.yml
+- type: LLMsTxt
+  url: llms/bioaegis-therapeutics-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+x-enrichment:
+  date: '2026-08-07'
+  status: enriched
+  artifacts_added: 17
+  pass: local-v1

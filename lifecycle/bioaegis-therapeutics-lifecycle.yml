@@ -1,0 +1,80 @@
+generated: '2026-08-07'
+method: derived
+source: >-
+  A search of www.bioaegistherapeutics.com for versioning, deprecation, SLA, changelog and status
+  pages, plus live response headers from https://www.bioaegistherapeutics.com/wp-json/ on
+  2026-08-07.
+api: bioaegis-therapeutics-content-api
+summary: >-
+  BioAegis Therapeutics publishes no API lifecycle commitments of any kind. It does not present
+  this surface as an API, so there is no versioning policy, no deprecation policy, no SLA, no
+  status page and no changelog for it. What follows is what an integrator can actually observe.
+versioning:
+  scheme: namespace-in-path
+  current: wp/v2
+  owner: WordPress core, not BioAegis Therapeutics
+  policy_published: false
+  detail: >-
+    The only version identifier is the WordPress core namespace. BioAegis does not version this
+    surface; its shape changes when WordPress or one of its plugins is upgraded, without notice.
+    Seventeen namespaces are registered — oembed/1.0, redirection/v1, yoast/v1, elementor-one/v1,
+    duplicate-post/v1, elementor/v1, elementor-pro/v1, monsterinsights/v1, astra/v1,
+    elementor/v1/documents, elementor-ai/v1, elementor/v1/feedback, nps-survey/v1, wp/v2,
+    wp-site-health/v1, wp-block-editor/v1 and wp-abilities/v1 — and thirteen of the seventeen are
+    plugin- or theme-owned, so they will appear and disappear with plugin changes.
+  stability_risk: >-
+    Highest for the plugin namespaces. The `yoast/v1/get_head` operation catalogued here — the only
+    source of the site's schema.org graph over the API — exists solely because Yoast SEO is
+    installed and would vanish if the plugin were removed or replaced. The core `wp/v2` collections
+    (posts, pages, media, categories, types, taxonomies, statuses, search) and `oembed/1.0/embed`
+    are the stable half of the surface.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  detail: >-
+    No Sunset or Deprecation header was observed on any response, and no deprecation notice is
+    published anywhere on the site. Nothing in the OpenAPI carries `deprecated: true`.
+  deprecated_operations: []
+sla:
+  published: false
+  uptime_target: null
+  support_channel: https://www.bioaegistherapeutics.com/contact-us/
+  support_note: >-
+    The contact page carries a web form plus two named human contacts — media (clagana@bioaegistx.com)
+    and investor relations (scordovano@bioaegistx.com). Neither is a technical support channel and
+    neither is offered for this surface.
+status_page:
+  published: false
+  probes:
+  - url: https://status.bioaegistherapeutics.com/
+    status: DNS_NXDOMAIN
+  - url: https://www.bioaegistherapeutics.com/status
+    status: 404
+  detail: >-
+    No status page exists. No StatusPage pointer is emitted in apis.yml, because none is earned.
+changelog:
+  published: false
+  api_changelog: false
+  detail: >-
+    There is no API changelog. The company does publish a dated corporate news stream — 94 press
+    releases under category 11, most recently the April 2026 Prenosis collaboration announcement —
+    reachable at /wp/v2/posts?categories=11 and via the RSS feed at /feed/. That is company news,
+    not API change history, and no ChangeLog pointer is emitted for it.
+observable_change_signals:
+- signal: object `modified` / `modified_gmt` fields
+  detail: >-
+    Every post, page and media item carries a modification timestamp. Polling
+    /wp/v2/posts?_fields=id,modified&orderby=modified&order=desc&per_page=1 is the only reliable
+    way to detect content change, since no ETag, Last-Modified or Cache-Control header is served.
+- signal: /sitemap_index.xml lastmod
+  detail: >-
+    The Yoast sitemap index carries per-child lastmod values (post-sitemap 2026-04-21,
+    page-sitemap 2026-05-15, category-sitemap 2026-04-21, author-sitemap 2025-11-19). Cheaper to
+    poll than the API for a coarse "has anything changed" check.
+- signal: /wp-json/ route table
+  detail: >-
+    The route index is the only way to detect that the CONTRACT changed. A consumer depending on a
+    plugin namespace should diff the 308-route table rather than assume stability.
+observed_at: '2026-08-07'

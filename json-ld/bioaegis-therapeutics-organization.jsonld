@@ -1,0 +1,104 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.bioaegistherapeutics.com/",
+      "url": "https://www.bioaegistherapeutics.com/",
+      "name": "Plasma Gelsolin Immune Protein | BioAegis Therapeutics",
+      "isPartOf": {
+        "@id": "https://www.bioaegistherapeutics.com/#website"
+      },
+      "primaryImageOfPage": {
+        "@id": "https://www.bioaegistherapeutics.com/#primaryimage"
+      },
+      "image": {
+        "@id": "https://www.bioaegistherapeutics.com/#primaryimage"
+      },
+      "thumbnailUrl": "https://www.bioaegistherapeutics.com/wp-content/uploads/2025/11/BTI-New-Hero.jpg",
+      "datePublished": "2015-03-09T20:16:22+00:00",
+      "dateModified": "2025-12-12T00:39:05+00:00",
+      "description": "BioAegis Therapeutics is focused on developing therapies for inflammatory diseases through a portfolio built around plasma gelsolin (pGSN), a naturally occurring human protein that is at the core of a system to regulate the innate immune response.",
+      "breadcrumb": {
+        "@id": "https://www.bioaegistherapeutics.com/#breadcrumb"
+      },
+      "inLanguage": "en",
+      "potentialAction": [
+        {
+          "@type": "ReadAction",
+          "target": [
+            "https://www.bioaegistherapeutics.com/"
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "ImageObject",
+      "inLanguage": "en",
+      "@id": "https://www.bioaegistherapeutics.com/#primaryimage",
+      "url": "https://www.bioaegistherapeutics.com/wp-content/uploads/2025/11/BTI-New-Hero.jpg",
+      "contentUrl": "https://www.bioaegistherapeutics.com/wp-content/uploads/2025/11/BTI-New-Hero.jpg",
+      "width": 2000,
+      "height": 1121
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.bioaegistherapeutics.com/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.bioaegistherapeutics.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Home"
+        }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.bioaegistherapeutics.com/#website",
+      "url": "https://www.bioaegistherapeutics.com/",
+      "name": "BioAegis Therapeutics",
+      "description": "The Power of Innate Immunity",
+      "publisher": {
+        "@id": "https://www.bioaegistherapeutics.com/#organization"
+      },
+      "potentialAction": [
+        {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://www.bioaegistherapeutics.com/?s={search_term_string}"
+          },
+          "query-input": {
+            "@type": "PropertyValueSpecification",
+            "valueRequired": true,
+            "valueName": "search_term_string"
+          }
+        }
+      ],
+      "inLanguage": "en"
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.bioaegistherapeutics.com/#organization",
+      "name": "BioAegis Therapeutics",
+      "url": "https://www.bioaegistherapeutics.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "inLanguage": "en",
+        "@id": "https://www.bioaegistherapeutics.com/#/schema/logo/image/",
+        "url": "",
+        "contentUrl": "",
+        "caption": "BioAegis Therapeutics"
+      },
+      "image": {
+        "@id": "https://www.bioaegistherapeutics.com/#/schema/logo/image/"
+      }
+    }
+  ]
+}

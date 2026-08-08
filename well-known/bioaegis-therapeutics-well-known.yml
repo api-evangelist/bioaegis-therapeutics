@@ -1,0 +1,98 @@
+generated: '2026-08-07'
+method: probed
+source: live GET probes of every /.well-known/ path against the content-API host
+description: >-
+  Result of probing the RFC-registered /.well-known/ discovery surface on the only host BioAegis
+  Therapeutics operates, www.bioaegistherapeutics.com. Every path returned 404. The host is a
+  WordPress site behind a Sucuri CloudProxy WAF; it answers unknown paths with the theme's own 404
+  HTML page (a ~92KB rendered document, distinct in size from the ~143KB homepage), not a catch-all
+  200, so these are true misses rather than SPA false negatives. Absence of a record is valid data
+  — BioAegis Therapeutics publishes no security.txt, no OAuth or OpenID discovery document, no
+  api-catalog, no AI plugin manifest and no agent card. No raw files were saved because nothing
+  returned 200.
+hosts:
+- host: https://www.bioaegistherapeutics.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+  - path: /.well-known/mcp.json
+    status: 404
+    file: null
+  - path: /.well-known/change-password
+    status: 404
+    file: null
+  - path: /.well-known/dnt-policy.txt
+    status: 404
+    file: null
+  - path: /security.txt
+    status: 404
+    file: null
+other_discovery:
+- path: /robots.txt
+  status: 200
+  note: >-
+    Yoast-generated. Declares `User-agent: *` with an empty `Disallow:` — nothing is disallowed —
+    and points at the sitemap index. Crawling is explicitly permitted, including by agents.
+- path: /sitemap_index.xml
+  status: 200
+  note: >-
+    Yoast sitemap index with four child sitemaps — post-sitemap.xml (lastmod 2026-04-21),
+    page-sitemap.xml (2026-05-15), category-sitemap.xml (2026-04-21) and author-sitemap.xml
+    (2025-11-19). The author sitemap publicly exposes three author slugs (admin, serrao6, sserrao)
+    that the REST API blocks at the WAF — the two surfaces disagree about whether authorship is
+    public.
+- path: /sitemap.xml
+  status: 200
+  note: Redirects to / serves the same Yoast index.
+- path: /feed/
+  status: 200
+  note: RSS 2.0 feed of the post stream. Wired in apis.yml as type BlogRSS.
+- path: /wp-json/
+  status: 200
+  note: >-
+    The WordPress REST route index — the actual machine-readable contract for this host. 308 routes
+    across 17 namespaces. This is what the OpenAPI in openapi/ was derived from.
+- path: /llms.txt
+  status: 404
+  note: No agent-facing content manifest. A generated one is provided in llms/ by API Evangelist.
+- path: /ai.txt
+  status: 404
+- path: /openapi.json
+  status: 404
+- path: /swagger.json
+  status: 404
+- path: /api-docs
+  status: 404
+- path: /api
+  status: 404
+- path: /developers
+  status: 404
+- path: /developer
+  status: 404
+- path: /docs
+  status: 404
+- path: /graphql
+  status: 404
+checked: '2026-08-07'

@@ -1,0 +1,28 @@
+generated: '2026-08-07'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.bioaegistherapeutics.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 29 08:17:12 2026 GMT
+  hsts: false
+- host: developer.wordpress.org
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct 23 19:43:55 2026 GMT
+  hsts: false
+domains:
+- domain: bioaegistherapeutics.com
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: false
+- domain: wordpress.org
+  dnssec: false
+  caa:
+  - 0 issue "letsencrypt.org;validationmethods=dns-01;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/53691143"
+  - 0 iodef "mailto:caa@wordpress.org"
+  spf: true
+  dmarc: true
+  dmarc_policy: reject

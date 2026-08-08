@@ -1,0 +1,207 @@
+generated: '2026-08-07'
+method: derived
+source: >-
+  openapi/bioaegis-therapeutics-content-openapi.yml plus live anonymous error responses captured
+  from https://www.bioaegistherapeutics.com/wp-json/ on 2026-08-07.
+api: bioaegis-therapeutics-content-api
+format: wordpress-rest-error
+rfc9457: false
+summary: >-
+  The error catalog for the BioAegis Therapeutics content API. BioAegis Therapeutics publishes no
+  error reference — every entry below was captured by provoking the condition against the live
+  surface. Errors are served as `application/json` with the WordPress `{code, message, data}`
+  envelope, NOT as `application/problem+json`: there is no `type` URI, no `title`, no `instance`
+  and no `detail` member. The HTTP status is duplicated inside `data.status`, so a client reading
+  only the body can still recover it. One case breaks the pattern entirely — /wp/v2/users is
+  intercepted by the Sucuri CloudProxy WAF and answered with an HTML interstitial, so a client that
+  assumes every error body is JSON will throw rather than read a code.
+envelope:
+  media_type: application/json
+  members:
+  - name: code
+    type: string
+    description: Machine-readable error code. The stable identifier — match on this, not on message.
+  - name: message
+    type: string
+    description: Human-readable, localizable message. Not stable across WordPress versions.
+  - name: data.status
+    type: integer
+    description: HTTP status code, repeated in the body.
+  - name: data.params
+    type: object
+    description: Per-parameter validation messages. Present only on rest_invalid_param.
+  - name: data.details
+    type: object
+    description: Per-parameter structured detail with its own nested code. Present only on rest_invalid_param.
+problem_types:
+- code: rest_invalid_param
+  status: 400
+  title: Invalid query parameter
+  observed_at: /wp/v2/posts?per_page=999
+  message: 'Invalid parameter(s): per_page'
+  detail: >-
+    One or more query parameters failed schema validation. The `data.params` map names each
+    offending parameter with a human message, and `data.details` repeats it with a nested code
+    (here `rest_out_of_bounds`).
+  remediation: >-
+    Read `data.params` to find the offending parameter. per_page must be between 1 and 100
+    inclusive; page must be >= 1; date filters (after/before) must be ISO 8601.
+  verified: true
+- code: rest_post_invalid_id
+  status: 404
+  title: Invalid post ID
+  observed_at: /wp/v2/posts/99999
+  message: Invalid post ID.
+  detail: >-
+    No published object exists with that ID in that collection. Returned for posts, pages and media
+    alike. Note it is also what you get for an object that exists but is not published — the API
+    does not distinguish "gone" from "not yours to see".
+  remediation: List the collection or use /wp/v2/search to resolve a valid ID.
+  verified: true
+- code: rest_term_invalid
+  status: 404
+  title: Term does not exist
+  observed_at: /wp/v2/categories/{id}
+  message: Term does not exist.
+  detail: No term exists with that ID in the requested taxonomy.
+  remediation: List /wp/v2/categories (10 terms on this deployment) to resolve a valid term ID.
+  verified: false
+  verification_note: Derived from the WordPress core contract; not provoked against this host.
+- code: rest_no_route
+  status: 404
+  title: No matching route
+  observed_at: /yoast/v1/configuration, /monsterinsights/v1/auth, /nps-survey/v1/nps-survey
+  message: No route was found matching the URL and request method.
+  detail: >-
+    The path is not registered, or is registered but not for that method. On this deployment it is
+    also what several plugin namespaces return for their advertised sub-paths, because the routes
+    exist only in an administrative context.
+  remediation: Fetch /wp-json/ and read the `routes` table rather than guessing paths.
+  verified: true
+- code: rest_forbidden
+  status: 401
+  title: Not allowed
+  observed_at: /wp/v2/settings, /redirection/v1/redirect, /wp-abilities/v1/abilities, /wp-abilities/v1/categories, /oembed/1.0/proxy, /yoast/v1/available_posts, /wp-site-health/v1/tests/background-updates
+  message: 'Sorry, you are not allowed to do that.'
+  detail: >-
+    The generic capability refusal. Note WordPress returns 401 rather than 403 for these, even
+    though the caller is anonymous and no credential would help a third party.
+  remediation: >-
+    None available to a third party. These routes require a wp-admin session or an application
+    password issued from wp-admin.
+  verified: true
+- code: rest_cannot_view
+  status: 401
+  title: Cannot view resource
+  observed_at: /wp/v2/menus, /wp/v2/menu-locations, /wp/v2/block-patterns/categories
+  message: 'Sorry, you are not allowed to view this resource.'
+  detail: Capability-scoped refusal for navigation and block-pattern resources.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_view_themes
+  status: 401
+  title: Cannot view themes
+  observed_at: /wp/v2/themes
+  detail: Theme listing requires an authenticated administrative capability.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_view_plugins
+  status: 401
+  title: Cannot view plugins
+  observed_at: /wp/v2/plugins
+  detail: >-
+    Plugin listing requires an authenticated administrative capability. Correct posture — the
+    plugin inventory is a fingerprinting aid.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_manage_templates
+  status: 401
+  title: Cannot manage templates
+  observed_at: /wp/v2/templates, /wp/v2/template-parts
+  detail: Site-editor template resources require an authenticated administrative capability.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_read_global_styles
+  status: 401
+  title: Cannot read global styles
+  observed_at: /wp/v2/global-styles/themes/astra
+  detail: Global style resources for the active theme (Astra) require an authenticated capability.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_block_type_cannot_view
+  status: 401
+  title: Cannot view block types
+  observed_at: /wp/v2/block-types
+  detail: The registered block-type index requires an authenticated capability.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_pattern_directory_cannot_view
+  status: 401
+  title: Cannot view pattern directory
+  observed_at: /wp/v2/pattern-directory/patterns
+  detail: The remote WordPress.org pattern-directory proxy requires an authenticated capability.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_manage_widgets
+  status: 401
+  title: Cannot manage widgets
+  observed_at: /wp/v2/sidebars, /wp/v2/widget-types
+  detail: Widget and sidebar resources require an authenticated administrative capability.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_read
+  status: 401
+  title: Cannot read resource
+  observed_at: /wp/v2/font-collections, /wp/v2/posts/{id}/revisions
+  detail: >-
+    Revision history and font collections require an authenticated capability. Revisions being
+    closed is why the `version-history` link relation on every post is unresolvable anonymously.
+  remediation: None available to a third party.
+  verified: true
+- code: rest_cannot_export_templates
+  status: 401
+  title: Cannot export templates
+  observed_at: /wp-block-editor/v1/export
+  detail: Template export requires an authenticated administrative capability.
+  remediation: None available to a third party.
+  verified: true
+non_json_errors:
+- surface: /wp/v2/users, /wp/v2/users/me
+  status: 403
+  media_type: text/html
+  emitted_by: 'Sucuri CloudProxy WAF (Server: Sucuri/Cloudproxy)'
+  detail: >-
+    The user-enumeration endpoints are blocked at the edge, before WordPress sees the request. The
+    response is a full HTML interstitial referencing cdn.sucuri.net stylesheets, not a WordPress
+    JSON error. This is a deliberate, and correct, hardening choice — but it means the error
+    contract is not uniform. A consumer MUST branch on Content-Type before parsing.
+  consequence: >-
+    Author identity is unresolvable on this surface. Every post and page returns an integer
+    `author` field (observed value 2) that cannot be dereferenced, and `_embed` on the author link
+    relation returns an error stub.
+  verified: true
+- surface: /astra/v1/get-sites
+  status: 502
+  media_type: text/html
+  detail: The Astra theme's remote-sites route returns a bad gateway anonymously rather than an auth error.
+  verified: true
+- surface: /elementor/v1/globals
+  status: 500
+  detail: The Elementor globals route returns a server error anonymously rather than an auth error.
+  verified: true
+gaps:
+- issue: >-
+    No RFC 9457 problem+json. There is no `type` URI a client can dereference for documentation, no
+    stable `title`, and no `instance`, so errors cannot be linked to a reference — because there is
+    no reference to link to.
+- issue: >-
+    401 is used where 403 is meant. Every capability refusal returns 401 Unauthorized to an
+    anonymous caller for whom no credential exists, rather than 403 Forbidden. A client
+    implementing standard retry-with-credentials logic will loop.
+- issue: >-
+    The error contract is not uniform across the surface — one endpoint answers in HTML from the
+    edge. Any generic client must sniff Content-Type.
+docs: null
+docs_note: >-
+  BioAegis Therapeutics publishes no error reference. Upstream codes are documented informally
+  across the WordPress REST handbook at https://developer.wordpress.org/rest-api/.

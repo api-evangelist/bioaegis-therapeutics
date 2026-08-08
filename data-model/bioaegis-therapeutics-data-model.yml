@@ -1,0 +1,156 @@
+generated: '2026-08-07'
+method: derived
+source: >-
+  openapi/bioaegis-therapeutics-content-openapi.yml $ref graph and id-reference fields, plus live
+  anonymous responses from https://www.bioaegistherapeutics.com/wp-json/ on 2026-08-07.
+api: bioaegis-therapeutics-content-api
+summary: >-
+  The entity-relationship graph of the BioAegis Therapeutics content API. Six substantive entities,
+  three of them populated. The graph is small and almost entirely denormalized into integer ID
+  references — WordPress does not inline related objects unless `_embed` is requested — and one arc
+  (Post/Page → User) is BROKEN on this deployment because the WAF blocks /wp/v2/users, so `author`
+  is a dangling integer no consumer can resolve.
+id_scheme:
+  style: integer
+  prefixed: false
+  detail: >-
+    All identifiers are unsigned integers assigned by WordPress at insert time and shared across a
+    single `wp_posts` table, so Post, Page and MediaItem IDs come from ONE sequence and never
+    collide with each other. Term IDs come from a separate sequence and DO collide with post IDs
+    numerically — category 11 and post 11 are unrelated objects. There are no type prefixes, so an
+    integer alone is ambiguous; always carry the collection with the ID.
+  observed_ranges:
+    pages: 3 - 5753
+    posts: up to 5904
+    media: up to 2910+ (site logo is 2910)
+    categories: 1 - 25
+entities:
+- name: Post
+  collection: /wp/v2/posts
+  count: 153
+  primary_key: id
+  schema: '#/components/schemas/Post'
+  description: >-
+    The workhorse entity. Carries every press release, publication reference, event listing, and —
+    unusually — the leadership, board and clinical-advisory-board biographies, which are authored
+    as posts in dedicated categories rather than as a custom post type. `content.rendered` is
+    populated, so full prose is retrievable.
+- name: Page
+  collection: /wp/v2/pages
+  count: 14
+  primary_key: id
+  schema: '#/components/schemas/Page'
+  description: >-
+    The corporate site structure. All 14 pages are top-level (`parent` is 0 on every one), so the
+    page hierarchy is flat. Bodies are rendered Elementor markup and can exceed 100KB.
+- name: MediaItem
+  collection: /wp/v2/media
+  count: 247
+  primary_key: id
+  schema: '#/components/schemas/MediaItem'
+  description: >-
+    Attachments. Predominantly WebP images — logos, headshots, mechanism-of-action diagrams,
+    press-release art. Each carries `media_details.sizes`, a map of generated renditions.
+- name: Term
+  collection: /wp/v2/categories
+  count: 10
+  primary_key: id
+  schema: '#/components/schemas/Term'
+  description: >-
+    Hierarchical `category` terms — News (11, 94 posts), Publication (12, 34), Event (15, 9),
+    Clinical (5, 6), Leadership (7, 5), Board (25, 4), Feature (24, 2), COVID19 (14, 1),
+    Uncategorized (1, 1), Jobs (17, 0). This is the only working classification axis.
+- name: Tag
+  collection: /wp/v2/tags
+  count: 0
+  primary_key: id
+  description: >-
+    The flat `post_tag` taxonomy. Registered and reachable but EMPTY. `Post.tags` is an empty array
+    on every record, so this entity has no instances and no arcs.
+- name: User
+  collection: /wp/v2/users
+  count: unknown
+  primary_key: id
+  reachable: false
+  description: >-
+    Blocked at the edge by the Sucuri WAF (403, HTML). Cannot be listed or dereferenced. Included
+    here only because every Post and Page carries a foreign key to it.
+relationships:
+- from: Post
+  to: Term
+  type: has_many
+  via: categories
+  reverse: /wp/v2/posts?categories={id}
+  resolvable: true
+  note: Integer array of category term IDs. Resolve via /wp/v2/categories/{id}.
+- from: Post
+  to: Tag
+  type: has_many
+  via: tags
+  resolvable: true
+  note: Always an empty array on this deployment.
+- from: Post
+  to: MediaItem
+  type: has_one
+  via: featured_media
+  resolvable: true
+  note: Integer attachment ID; 0 when no featured image. Resolve via /wp/v2/media/{id} or `_embed`.
+- from: Page
+  to: MediaItem
+  type: has_one
+  via: featured_media
+  resolvable: true
+- from: MediaItem
+  to: Post
+  type: belongs_to
+  via: post
+  resolvable: true
+  note: The post or page the attachment was uploaded to; 0 when uploaded directly to the library.
+- from: Post
+  to: User
+  type: belongs_to
+  via: author
+  resolvable: false
+  broken: true
+  note: >-
+    THE BROKEN ARC. Every post carries `author` (observed value 2), but /wp/v2/users returns 403
+    from the Sucuri WAF, so the reference cannot be dereferenced and `_embed` on the author link
+    returns an error stub. Attribution is present in the data model and absent from the surface.
+    The author-sitemap.xml at /author-sitemap.xml does expose three author slugs (admin, serrao6,
+    sserrao) publicly, so the block is not a privacy posture applied consistently — it stops the
+    API but not the sitemap.
+- from: Page
+  to: User
+  type: belongs_to
+  via: author
+  resolvable: false
+  broken: true
+- from: Page
+  to: Page
+  type: belongs_to
+  via: parent
+  resolvable: true
+  note: Self-referential hierarchy. Unused — `parent` is 0 on all 14 pages.
+- from: Term
+  to: Term
+  type: belongs_to
+  via: parent
+  resolvable: true
+  note: Self-referential category hierarchy. Unused — every category is top-level.
+- from: Post
+  to: Comment
+  type: has_many
+  via: _links.replies
+  resolvable: true
+  note: /wp/v2/comments is reachable but empty (X-WP-Total 0), so this arc has no instances.
+link_relations:
+  style: HAL-ish `_links` map with curies
+  relations: [self, collection, about, author, replies, version-history, predecessor-version, 'wp:attachment', 'wp:term', curies]
+  note: >-
+    `author` and `version-history` are advertised on every object but neither resolves anonymously
+    (403 and 401 respectively). Two of the ten advertised relations are dead links for a public
+    consumer.
+render: null
+render_note: >-
+  No subway/ diagram in this repo. The graph is small enough to read directly: three populated
+  entities (Post, Page, MediaItem), one populated taxonomy (Term), one dangling foreign key (User).

@@ -1,0 +1,169 @@
+generated: '2026-08-07'
+method: derived
+source: >-
+  openapi/bioaegis-therapeutics-content-openapi.yml plus live anonymous request/response headers
+  observed against https://www.bioaegistherapeutics.com/wp-json/ on 2026-08-07.
+api: bioaegis-therapeutics-content-api
+summary: >-
+  Cross-cutting runtime semantics of the BioAegis Therapeutics content API. These are WordPress
+  core conventions, not conventions BioAegis Therapeutics authored or documents — the company
+  publishes no developer documentation for this surface. They are recorded here because they are
+  what an integrator actually has to code against.
+authentication:
+  style: none-for-reads
+  detail: >-
+    Read operations take no credential. The REST index advertises WordPress application passwords
+    (HTTP Basic) as the only provider, but its authorization endpoint sits behind wp-admin and is
+    not obtainable by a third party. See authentication/bioaegis-therapeutics-authentication.yml.
+idempotency:
+  supported: true
+  mechanism: http-method-semantics
+  header: null
+  scope: null
+  retention: null
+  detail: >-
+    There is NO idempotency-key facility on this surface — no Idempotency-Key header, no request
+    dedupe window, no replay protection. Idempotency here is the plain HTTP kind: the entire public
+    surface is GET-only (the `Allow` response header on every collection returns exactly `GET`),
+    and GET is idempotent and safe by definition, so any modelled operation can be retried without
+    side effects. Every mutating route in the route index — POST/PUT/PATCH/DELETE on posts, pages,
+    media, terms, comments and settings — refuses anonymous callers, so no non-idempotent operation
+    is reachable at all. An integrator can retry any call in this repo freely; there is nothing to
+    make idempotent that is not already idempotent.
+  caveat: >-
+    This is a property of the surface being read-only, not a guarantee the provider makes. If
+    BioAegis ever opened a write path, no idempotency mechanism exists to protect it.
+pagination:
+  style: page-number
+  params:
+  - name: page
+    default: 1
+    minimum: 1
+  - name: per_page
+    default: 10
+    minimum: 1
+    maximum: 100
+    note: Values outside 1-100 return 400 rest_invalid_param with a per-parameter `details` block.
+  - name: offset
+    note: Supported as an alternative to page on post-type collections.
+  response_fields: []
+  response_headers:
+  - name: X-WP-Total
+    description: >-
+      Total matching records across all pages. Observed 153 on /wp/v2/posts, 14 on /wp/v2/pages,
+      247 on /wp/v2/media, 10 on /wp/v2/categories, 137 on a search for "gelsolin", and 0 on
+      /wp/v2/tags, /wp/v2/comments, /wp/v2/blocks and /wp/v2/navigation.
+  - name: X-WP-TotalPages
+    description: Total pages at the current per_page.
+  - name: Link
+    description: RFC 8288 Link header carrying rel="next" and rel="prev".
+  exposed_via_cors:
+    header: Access-Control-Expose-Headers
+    value: 'X-WP-Total, X-WP-TotalPages, Link'
+    note: The pagination headers ARE exposed to browser clients — a cross-origin reader can read the totals.
+  note: >-
+    The collection body is a bare JSON array with no envelope, so the totals live only in headers.
+    A client that reads only the body cannot tell whether more pages exist.
+sorting:
+  params: [order, orderby]
+  order_default: desc
+  orderby_default: date
+  note: >-
+    orderby accepts author, date, id, include, modified, parent, relevance, slug, include_slugs and
+    title on posts and pages (plus menu_order on pages); id, include, name, slug, include_slugs,
+    term_group, description and count on terms.
+filtering:
+  params: [search, after, before, include, exclude, slug, categories, categories_exclude, parent, media_type, mime_type]
+  note: >-
+    `categories` is the only useful content filter on this deployment, because `post_tag` is empty.
+    Category 11 (News, 94 posts) and 12 (Publication, 34 posts) carry most of the corpus.
+sparse_fieldsets:
+  supported: true
+  param: _fields
+  style: comma-separated
+  detail: >-
+    `_fields=id,slug,title,link,date,modified` is the single most important parameter on this
+    surface. `content.rendered` is populated and can be very large — the Our Platform page (id
+    5753) returns ~100KB of rendered Elementor markup and the Our Science page (id 5277) ~45KB — so
+    an unfiltered `/wp/v2/pages?per_page=100` is a multi-megabyte response. Always project.
+expansion:
+  supported: partial
+  param: _embed
+  detail: >-
+    `_embed` inlines the resources named in `_links` (author, wp:featuredmedia, wp:term, replies).
+    On this deployment the `author` embed fails to resolve because /wp/v2/users is 403 at the WAF,
+    so `_embedded.author` comes back as an error stub. `wp:featuredmedia` and `wp:term` embed
+    correctly.
+metadata:
+  supported: true
+  field: meta
+  detail: >-
+    Every object carries a `meta` object for registered post meta. It is effectively empty on this
+    deployment — the Elementor page-builder data lives in unregistered post meta that WordPress
+    does not project into REST.
+request_id:
+  supported: false
+  header: null
+  detail: >-
+    No request-id or correlation header is returned. The only per-request identifier is
+    `X-Sucuri-ID`, an opaque WAF-side counter (observed value 14022) that is useful to the WAF
+    operator, not to an integrator, and is not documented anywhere.
+versioning:
+  scheme: namespace-in-path
+  current: wp/v2
+  detail: See lifecycle/bioaegis-therapeutics-lifecycle.yml. The version is WordPress core's, not BioAegis's.
+error_envelope:
+  media_type: application/json
+  rfc9457: false
+  shape: '{code: string, message: string, data: {status: int, params?: object, details?: object}}'
+  detail: >-
+    Errors are the WordPress envelope, not RFC 9457 problem+json. The HTTP status is duplicated
+    inside `data.status`. One exception: /wp/v2/users returns an HTML page from the Sucuri WAF, so
+    a client must not assume every error body parses as JSON. See
+    errors/bioaegis-therapeutics-problem-types.yml.
+rate_limiting:
+  published: false
+  headers_observed: []
+  detail: >-
+    No RateLimit, X-RateLimit-* or Retry-After headers were observed on any response, and no rate
+    limit is documented. The Sucuri CloudProxy WAF in front of the origin may throttle or challenge
+    aggressive callers without advertising a budget, so a consumer has no published allowance to
+    plan against. Crawl politely.
+caching:
+  headers_observed:
+  - name: X-Sucuri-Cache
+    value: BYPASS
+    note: REST responses are marked BYPASS at the WAF cache — they are served from origin, not cached.
+  etag: false
+  last_modified: false
+  cache_control: none-observed
+  conditional_requests: false
+  detail: >-
+    No ETag, no Last-Modified and no Cache-Control on REST responses, so conditional requests are
+    impossible and a polling consumer must refetch bodies in full. Each object does carry a
+    `modified` / `modified_gmt` field, so change detection is possible in the body — poll
+    `/wp/v2/posts?_fields=id,modified&orderby=modified&order=desc&per_page=1` and compare.
+cors:
+  allow_headers: 'Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type'
+  expose_headers: 'X-WP-Total, X-WP-TotalPages, Link'
+  note: CORS is configured by WordPress core defaults; no origin restriction was observed on GET.
+security_headers:
+  x_content_type_options: nosniff
+  x_frame_options: SAMEORIGIN
+  x_xss_protection: '1; mode=block'
+  x_robots_tag: noindex
+  strict_transport_security: absent
+  server: Sucuri/Cloudproxy
+  note: >-
+    `X-Robots-Tag: noindex` on every /wp-json/ response is WordPress core telling search engines
+    not to index the API. It does not restrict programmatic access.
+cross_links:
+  errors: errors/bioaegis-therapeutics-problem-types.yml
+  lifecycle: lifecycle/bioaegis-therapeutics-lifecycle.yml
+  authentication: authentication/bioaegis-therapeutics-authentication.yml
+  data_model: data-model/bioaegis-therapeutics-data-model.yml
+  rate_limits: null
+docs: null
+docs_note: >-
+  BioAegis Therapeutics publishes no conventions documentation. The upstream contract is the
+  WordPress REST handbook at https://developer.wordpress.org/rest-api/.

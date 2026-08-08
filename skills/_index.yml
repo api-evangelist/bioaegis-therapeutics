@@ -1,0 +1,45 @@
+generated: '2026-08-07'
+method: generated
+source: openapi/bioaegis-therapeutics-content-openapi.yml
+note: >-
+  BioAegis Therapeutics publishes no AGENTS.md, no skills and no developer documentation of its
+  own — these are API Evangelist packaged operating instructions for the one machine-readable
+  surface it does expose, the anonymous WordPress REST content API behind
+  www.bioaegistherapeutics.com. Every operationId referenced below exists verbatim in the OpenAPI
+  in this repo. There is no product API, so there are no product flows to package; the skills cover
+  tracking the press and regulatory record, reading the corporate and clinical-trial narrative, and
+  mapping the people and publication graph — together with the four traps a naive consumer falls
+  into on this site: page bodies are ~100KB of rendered Elementor markup so `_fields` is
+  mandatory, `author` is a dead foreign key because the Sucuri WAF blocks /wp/v2/users with an HTML
+  403, there are zero tags so category is the only classification axis, and there is no
+  ETag/Last-Modified so change detection must run off each object's `modified` field.
+api: bioaegis-therapeutics:bioaegis-therapeutics-content-api
+skills:
+- file: bioaegis-therapeutics-track-press-releases.md
+  name: Track BioAegis Therapeutics press releases and regulatory milestones
+  description: >-
+    Build and incrementally poll an index of the 94 News press releases and 34 Publications —
+    covering the BTI-203 Phase 2 ARDS trial, the FDA Fast Track designations for ARDS and
+    decompression sickness, the $20M BARDA DRIVe contract, the U.S. Navy contract, financings and
+    board appointments — including how to detect change on a surface that serves no ETag or
+    Last-Modified header.
+  api: openapi/bioaegis-therapeutics-content-openapi.yml
+  operations: [listCategories, listPosts, getPost, searchContent]
+- file: bioaegis-therapeutics-read-corporate-content.md
+  name: Read BioAegis Therapeutics corporate, scientific and clinical-trial content
+  description: >-
+    Enumerate the 14 published pages — About Us, Our Science, Our Platform, BTI-203 Clinical Trial,
+    FAQs, Publications, Careers, Contact Us, Expanded Access Policy, Code of Ethics/Conduct, Terms
+    of Use, Privacy Policy — pull the schema.org identity graph via the Yoast head renderer, and
+    avoid accidentally downloading megabytes of rendered Elementor markup.
+  api: openapi/bioaegis-therapeutics-content-openapi.yml
+  operations: [getApiIndex, listTypes, listPages, getPage, getYoastHead]
+- file: bioaegis-therapeutics-map-people-and-publications.md
+  name: Map the BioAegis Therapeutics leadership, board, clinical advisors and publication record
+  description: >-
+    Retrieve the people graph and scientific citation record — 5 leadership profiles, 4 corporate
+    board members, 6 clinical advisory board members and 34 publication entries, all authored as
+    categorized posts rather than as a custom post type — plus the 247-item media library holding
+    their headshots and the company's scientific figures.
+  api: openapi/bioaegis-therapeutics-content-openapi.yml
+  operations: [listCategories, listPosts, getPost, listMedia, getMediaItem, searchContent]

@@ -1,0 +1,161 @@
+generated: '2026-08-07'
+method: derived
+source: >-
+  openapi/bioaegis-therapeutics-content-openapi.yml, live response headers and bodies from
+  https://www.bioaegistherapeutics.com/wp-json/ on 2026-08-07, and a search of
+  www.bioaegistherapeutics.com for published compliance or certification claims.
+api: bioaegis-therapeutics-content-api
+summary: >-
+  Cross-cutting standards assertions for the BioAegis Therapeutics content API. BioAegis
+  Therapeutics is a privately held, clinical-stage biopharmaceutical company; it operates a
+  corporate website, not a software platform, and it publishes no compliance program, no
+  certification page and no trust center. Every `conforms: false` below is an honest observation,
+  not a criticism of an API the company never set out to ship. Note that the company DOES operate
+  under substantial regulatory regimes as a drug developer — FDA IND, Fast Track, GCP/ICH for its
+  Phase 2 trials, and federal contracting rules under BARDA and the U.S. Navy — but none of that is
+  an API or information-security compliance claim, and it is not asserted as one here.
+standards:
+- id: rest
+  conforms: true
+  evidence: >-
+    Resource-oriented paths, GET-only public surface, JSON representations, and RFC 8288 Link
+    headers for pagination. HATEOAS is present via the `_links` map on every object, though two of
+    its ten relations (author, version-history) are dead for an anonymous consumer.
+- id: openapi
+  conforms: false
+  evidence: >-
+    BioAegis Therapeutics publishes no OpenAPI. The document in openapi/ is an API Evangelist
+    derivation of the route index the site publishes at /wp-json/, not a provider artifact.
+- id: json-schema
+  conforms: partial
+  evidence: >-
+    WordPress exposes a JSON Schema per route via the OPTIONS method and the `schema` block in the
+    route index, so a schema is discoverable per endpoint. It is Draft-04 flavoured WordPress
+    schema, not a published, versioned JSON Schema document set.
+- id: rfc9457
+  conforms: false
+  evidence: >-
+    Errors are served as application/json with the WordPress {code, message, data} envelope. No
+    `type` URI, no `title`, no `instance`, no application/problem+json media type. Worse, one
+    endpoint (/wp/v2/users) is answered by the Sucuri WAF in HTML, so the error contract is not
+    even internally uniform. See errors/bioaegis-therapeutics-problem-types.yml.
+- id: rfc8288
+  conforms: true
+  evidence: >-
+    Collection responses carry a Link header with rel="next"/rel="prev", and it is exposed to
+    browser clients via Access-Control-Expose-Headers.
+- id: pagination
+  conforms: true
+  evidence: >-
+    page + per_page (1-100), with X-WP-Total and X-WP-TotalPages headers. Offset paging also
+    supported. Out-of-bounds values return a structured 400.
+- id: idempotency
+  conforms: false
+  evidence: >-
+    No Idempotency-Key header, no dedupe window, no replay protection. The public surface is
+    GET-only, so every reachable operation is idempotent by HTTP method semantics — but that is a
+    consequence of the surface being read-only, not a facility the provider offers. No
+    `type: Idempotency` pointer is emitted in apis.yml, because none is earned.
+- id: rfc9116
+  conforms: false
+  evidence: >-
+    /.well-known/security.txt returns 404. No vulnerability-disclosure contact or policy is
+    published. See well-known/bioaegis-therapeutics-well-known.yml.
+- id: oauth2
+  conforms: false
+  evidence: >-
+    No OAuth 2.0 surface. /.well-known/oauth-authorization-server and
+    /.well-known/oauth-protected-resource both return 404. The only advertised auth provider is
+    WordPress application passwords (HTTP Basic), whose authorization endpoint is behind wp-admin.
+- id: oidc
+  conforms: false
+  evidence: /.well-known/openid-configuration returns 404.
+- id: rate-limit-headers
+  conforms: false
+  evidence: >-
+    No RateLimit, X-RateLimit-* or Retry-After headers were observed. The Sucuri CloudProxy WAF may
+    throttle without advertising a budget.
+- id: http-caching
+  conforms: false
+  evidence: >-
+    No ETag, no Last-Modified, no Cache-Control on REST responses. Conditional requests are
+    impossible; the WAF marks REST responses X-Sucuri-Cache: BYPASS.
+- id: cors
+  conforms: true
+  evidence: >-
+    Access-Control-Allow-Headers and Access-Control-Expose-Headers are set by WordPress core, and
+    the pagination headers are correctly exposed to cross-origin readers.
+- id: schema-org
+  conforms: true
+  evidence: >-
+    A schema.org JSON-LD @graph is published on every page by the Yoast SEO plugin and is
+    retrievable over the API via /yoast/v1/get_head. Five nodes — WebPage, ImageObject,
+    BreadcrumbList, WebSite, Organization. The Organization node is thin (empty logo URL, no
+    sameAs, no address). Saved verbatim in json-ld/. See json-ld/bioaegis-therapeutics-json-ld.yml.
+- id: oembed
+  conforms: true
+  evidence: >-
+    A conformant oEmbed 1.0 provider endpoint is registered at /oembed/1.0/embed and answers
+    anonymously for bioaegistherapeutics.com URLs.
+- id: sitemaps-xml
+  conforms: true
+  evidence: >-
+    A Yoast-generated sitemap index at /sitemap_index.xml with four child sitemaps (post, page,
+    category, author), each carrying lastmod. robots.txt points at it.
+- id: robots-txt
+  conforms: true
+  evidence: >-
+    Yoast-generated robots.txt. `User-agent: *` with an empty `Disallow:` — nothing is disallowed —
+    plus the sitemap reference. Crawling this site is explicitly permitted.
+- id: llms-txt
+  conforms: false
+  evidence: /llms.txt returns 404. No agent-facing content manifest is published.
+- id: mcp
+  conforms: false
+  evidence: >-
+    No MCP server. /.well-known/mcp.json returns 404. The WordPress Abilities API namespace
+    (wp-abilities/v1) IS registered — an agent-facing capability registry — but every endpoint
+    under it returns 401 rest_forbidden anonymously, so no agent surface exists in practice.
+- id: a2a
+  conforms: false
+  evidence: >-
+    /.well-known/agent-card.json and /.well-known/agent.json both return 404 (true 404s — the site
+    serves a real 404 page, not an SPA catch-all 200). No agent card is published.
+- id: dnssec
+  conforms: false
+  evidence: bioaegistherapeutics.com is not DNSSEC-signed. See security/bioaegis-therapeutics-domain-security.yml.
+- id: caa
+  conforms: false
+  evidence: No CAA records published for bioaegistherapeutics.com.
+- id: hsts
+  conforms: false
+  evidence: >-
+    HTTPS is enforced and TLS 1.3 negotiates, but no Strict-Transport-Security header is served, so
+    a first-contact downgrade is not prevented.
+- id: spf
+  conforms: true
+  evidence: An SPF record is published for bioaegistherapeutics.com.
+- id: dmarc
+  conforms: false
+  evidence: >-
+    No DMARC record for bioaegistherapeutics.com. SPF alone does not stop display-name or
+    subdomain spoofing, and there is no reporting channel. For a company whose two published
+    contact addresses are on the sibling bioaegistx.com domain and whose news stream is quoted by
+    financial press, this is the most consequential gap on this list — and the cheapest to close.
+certifications: []
+compliance_program:
+  published: false
+  trust_center: false
+  detail: >-
+    No trust center, no SOC 2, no ISO 27001, no HIPAA/HITRUST attestation and no certification page
+    is published on www.bioaegistherapeutics.com. Probed 2026-08-07. No `Compliance` or
+    `TrustCenter` pointer is emitted in apis.yml, because none is earned. The company does publish
+    a Code of Business Conduct and Ethics and an Expanded Access Policy, which are corporate
+    governance documents rather than information-security compliance artifacts.
+regulatory_context:
+  note: >-
+    Recorded for context only; asserts nothing about the API. BioAegis operates two FDA INDs with
+    Fast Track designation (ARDS and decompression sickness), runs a 600-patient Phase 2 trial
+    across 13 countries under GCP/ICH, and holds federal contracts with BARDA
+    (75A50123C00067, $20M) and, via the University of Maryland School of Medicine, the U.S. Navy
+    Office of Naval Research. None of these is an API or information-security compliance claim.

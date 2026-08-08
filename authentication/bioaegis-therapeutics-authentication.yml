@@ -1,0 +1,145 @@
+generated: '2026-08-07'
+method: probed
+source: >-
+  Live anonymous probes of https://www.bioaegistherapeutics.com/wp-json/ plus the WordPress REST
+  route index, 2026-08-07. BioAegis Therapeutics publishes no authentication documentation of its
+  own.
+api: bioaegis-therapeutics-content-api
+summary: >-
+  The BioAegis Therapeutics content API declares exactly one authentication provider, and it is not
+  usable by a third party. The REST index at /wp-json/ returns
+  `"authentication": {"application-passwords": {"endpoints": {"authorization":
+  "https://www.bioaegistherapeutics.com/wp-admin/authorize-application.php"}}}` — WordPress
+  application passwords, whose authorization endpoint requires an existing wp-admin login. The 23
+  read operations catalogued in this repo require no credentials at all. Everything else — writes,
+  users, settings, menus, themes, plugins, templates, revisions, the wp-abilities/v1 capability
+  registry, wp-site-health/v1, wp-block-editor/v1, redirection/v1 and the administrative half of
+  yoast/v1 — is refused anonymously, and the only credential paths are a logged-in WordPress
+  session cookie plus an X-WP-Nonce, or an application password issued from wp-admin. Neither is
+  obtainable by a third party and neither is documented publicly, so no usable scheme is asserted
+  here.
+schemes:
+- id: application-passwords
+  type: http
+  scheme: basic
+  usable_by_third_party: false
+  advertised_at: https://www.bioaegistherapeutics.com/wp-json/
+  authorization_endpoint: https://www.bioaegistherapeutics.com/wp-admin/authorize-application.php
+  note: >-
+    Advertised in the REST index, but the authorization endpoint is behind wp-admin. There is no
+    self-service signup, no OAuth flow, no API key issuance and no developer account of any kind.
+    Recorded because the provider advertises it, not because it is reachable.
+observed:
+- surface: read operations in openapi/bioaegis-therapeutics-content-openapi.yml
+  auth_required: false
+  evidence: 'All 23 modelled operations returned HTTP 200 with no Authorization header on 2026-08-07.'
+- surface: /wp/v2/users, /wp/v2/users/me
+  auth_required: true
+  status: 403
+  code: null
+  evidence: >-
+    Blocked at the edge by the Sucuri CloudProxy WAF, which answers with an HTML interstitial
+    (cdn.sucuri.net stylesheets) rather than a WordPress JSON error. This is the only operation on
+    the surface whose failure response is not JSON — a client parsing every response as JSON will
+    throw here rather than read an error code.
+- surface: /wp/v2/settings
+  auth_required: true
+  status: 401
+  code: rest_forbidden
+- surface: /wp/v2/menus, /wp/v2/menu-items, /wp/v2/menu-locations
+  auth_required: true
+  status: 401
+  code: rest_cannot_view
+- surface: /wp/v2/themes
+  auth_required: true
+  status: 401
+  code: rest_cannot_view_themes
+- surface: /wp/v2/plugins
+  auth_required: true
+  status: 401
+  code: rest_cannot_view_plugins
+- surface: /wp/v2/templates, /wp/v2/template-parts
+  auth_required: true
+  status: 401
+  code: rest_cannot_manage_templates
+- surface: /wp/v2/global-styles/themes/astra
+  auth_required: true
+  status: 401
+  code: rest_cannot_read_global_styles
+- surface: /wp/v2/block-types
+  auth_required: true
+  status: 401
+  code: rest_block_type_cannot_view
+- surface: /wp/v2/block-patterns/categories
+  auth_required: true
+  status: 401
+  code: rest_cannot_view
+- surface: /wp/v2/pattern-directory/patterns
+  auth_required: true
+  status: 401
+  code: rest_pattern_directory_cannot_view
+- surface: /wp/v2/sidebars, /wp/v2/widget-types
+  auth_required: true
+  status: 401
+  code: rest_cannot_manage_widgets
+- surface: /wp/v2/font-collections
+  auth_required: true
+  status: 401
+  code: rest_cannot_read
+- surface: /wp/v2/posts/{id}/revisions
+  auth_required: true
+  status: 401
+  code: rest_cannot_read
+- surface: /oembed/1.0/proxy
+  auth_required: true
+  status: 401
+  code: rest_forbidden
+  note: The oEmbed provider endpoint (/oembed/1.0/embed) is anonymous; only the third-party proxy is gated.
+- surface: /yoast/v1/available_posts
+  auth_required: true
+  status: 401
+  code: rest_forbidden
+  note: >-
+    52 of the 53 yoast/v1 routes are administrative. Only /yoast/v1/get_head answers anonymously.
+- surface: /wp-site-health/v1/*
+  auth_required: true
+  status: 401
+  code: rest_forbidden
+- surface: /wp-block-editor/v1/export
+  auth_required: true
+  status: 401
+  code: rest_cannot_export_templates
+- surface: /redirection/v1/redirect
+  auth_required: true
+  status: 401
+  code: rest_forbidden
+- surface: /wp-abilities/v1/abilities, /wp-abilities/v1/categories
+  auth_required: true
+  status: 401
+  code: rest_forbidden
+  note: >-
+    The WordPress Abilities API — an agent-facing capability registry — is registered on this
+    deployment but every endpoint under it, including the read-only /abilities and /categories
+    listings, refuses anonymous callers. The namespace index /wp-abilities/v1 itself returns 200
+    with route metadata only. No agent surface is claimed for this provider.
+- surface: /elementor/v1/globals
+  auth_required: unknown
+  status: 500
+  note: Returns a server error rather than an auth error anonymously.
+- surface: /astra/v1/get-sites
+  auth_required: unknown
+  status: 502
+  note: Returns a bad-gateway from the WAF/origin rather than an auth error anonymously.
+transport:
+  https_only: true
+  tls_version: TLSv1.3
+  hsts: false
+  note: >-
+    HTTPS is enforced and TLS 1.3 negotiates, but no Strict-Transport-Security header is served on
+    the API host, so a first-contact downgrade is not prevented. See
+    security/bioaegis-therapeutics-domain-security.yml.
+docs: null
+docs_note: >-
+  BioAegis Therapeutics publishes no authentication documentation for this surface. The upstream
+  contract is defined by the WordPress REST handbook at
+  https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/.

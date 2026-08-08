@@ -1,0 +1,44 @@
+generated: '2026-08-07'
+method: searched
+source: https://www.bioaegistherapeutics.com/wp-json/wp/v2/pages/901?_fields=yoast_head_json
+description: >-
+  The schema.org JSON-LD @graph BioAegis Therapeutics publishes on every page of
+  www.bioaegistherapeutics.com, saved verbatim from the homepage (page id 901) as served by the
+  site's own REST API. Emitted by the Yoast SEO plugin. It is the only structured, machine-readable
+  description of the company BioAegis Therapeutics publishes anywhere. The graph carries five
+  nodes — WebPage, ImageObject, BreadcrumbList, WebSite and Organization.
+files:
+- file: bioaegis-therapeutics-organization.jsonld
+  page_id: 901
+  page: https://www.bioaegistherapeutics.com/
+  http_status: 200
+  content_type: application/json
+  fetched: '2026-08-07'
+  nodes: [WebPage, ImageObject, BreadcrumbList, WebSite, Organization]
+gaps:
+- node: Organization
+  issue: >-
+    The Organization node is the thinnest node in the graph. It carries only `name`, `url` and a
+    logo ImageObject whose `url` and `contentUrl` are BOTH EMPTY STRINGS — Yoast is configured with
+    an organization name but no organization logo, so the logo reference resolves to nothing. There
+    is no `legalName` ("BioAegis Therapeutics, Inc."), no `address` (NJ Bioscience Center, 685 US
+    Route 1, North Brunswick, NJ 08902), no `foundingDate` (2011), and no `sameAs` array — even
+    though the site footer links three profiles (LinkedIn, X/Twitter, YouTube) that would populate
+    it directly. A consumer reading the graph cannot learn where the company is, when it was
+    founded, or where else it exists on the web.
+  remedy: >-
+    Set the organization logo in the Yoast SEO settings and add the social profile URLs, which
+    Yoast projects into `sameAs` automatically. Both are configuration, not code.
+- node: WebPage
+  issue: >-
+    `datePublished` on the homepage node is 2015-03-09, eleven years before the `dateModified` of
+    2025-12-12. The graph has no Article/NewsArticle nodes for the 94 press releases and no
+    MedicalStudy / MedicalTrial node for the BTI-203 Phase 2 ARDS trial, so the company's most
+    citable assets — its clinical programme and its news archive — carry no structured type.
+  remedy: >-
+    A clinical-stage company publishing trial material is the textbook case for schema.org
+    MedicalStudy / MedicalTrial markup, which search engines and agents both consume.
+note: >-
+  The same @graph is present on all 14 published pages and all 153 posts, varying only in the
+  WebPage, ImageObject and BreadcrumbList nodes. Nothing in the saved .jsonld file was authored by
+  API Evangelist — it is the provider's own bytes.

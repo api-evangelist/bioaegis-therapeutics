@@ -1,0 +1,1448 @@
+openapi: 3.1.0
+info:
+  title: BioAegis Therapeutics Content API
+  version: wp/v2
+  summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
+  description: >-
+    The read-only content surface BioAegis Therapeutics exposes at
+    https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held,
+    clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin
+    (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven
+    decompression sickness; it runs no developer program and markets no product API. This document
+    is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route
+    index the site publishes at /wp-json/, restricted to the operations that were verified to
+    return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`,
+    `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`,
+    `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`,
+    `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`,
+    `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves`
+    sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the
+    `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1`
+    namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1`
+    namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the
+    authenticated half of `yoast/v1` all require authentication (or return 404/500/502
+    anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  contact:
+    name: BioAegis Therapeutics
+    url: https://www.bioaegistherapeutics.com/contact-us/
+  x-api-evangelist-provenance: >-
+    Derived by the API Evangelist enrichment pipeline from the live WordPress REST route index at
+    https://www.bioaegistherapeutics.com/wp-json/ (308 routes across the namespaces oembed/1.0,
+    redirection/v1, yoast/v1, elementor-one/v1, duplicate-post/v1, elementor/v1, elementor-pro/v1,
+    monsterinsights/v1, astra/v1, elementor/v1/documents, elementor-ai/v1, elementor/v1/feedback,
+    nps-survey/v1, wp/v2, wp-site-health/v1, wp-block-editor/v1 and wp-abilities/v1) and verified
+    against live anonymous responses on 2026-08-07. Every parameter below appears verbatim in the
+    route index `args` for that endpoint, and every operation modelled here returned 200 without
+    credentials. The site is fronted by a Sucuri CloudProxy WAF, which answers /wp/v2/users and
+    /wp/v2/users/me with a 403 HTML interstitial instead of a JSON error — the only place on this
+    surface where the error envelope is not JSON. BioAegis Therapeutics publishes no OpenAPI, no
+    developer documentation and no API reference for this surface; the humanURL in apis.yml points
+    at the upstream WordPress REST handbook that defines the wp/v2 contract. Nothing here was
+    obtained with credentials.
+  license:
+    name: Site content is © BioAegis Therapeutics, Inc. — see Terms of Use
+    url: https://www.bioaegistherapeutics.com/terms-of-use/
+servers:
+  - url: https://www.bioaegistherapeutics.com/wp-json
+    description: Production content API
+tags:
+  - name: posts
+    description: >-
+      Post collection — 153 published items at harvest time, spanning News press releases (94),
+      Publications (34), Events (9), Clinical advisory board profiles (6), Leadership profiles (5),
+      Board profiles (4), Feature entries (2) and COVID19 (1).
+  - name: pages
+    description: >-
+      Corporate pages — 14 published at harvest time (Home, About Us, Our Science, Our Platform,
+      BTI-203 Clinical Trial, FAQs, Publications, News, Careers, Contact Us, Expanded Access
+      Policy, Code of Ethics/Conduct, Terms of Use, Privacy Policy).
+  - name: media
+    description: Media library — 247 attachments at harvest time.
+  - name: taxonomy
+    description: >-
+      Categories and tags. The hierarchical `category` taxonomy holds 10 terms and carries all
+      classification; the flat `post_tag` taxonomy is registered but empty (0 terms).
+  - name: comments
+    description: Comment collection. Registered and reachable, but empty (X-WP-Total 0).
+  - name: blocks
+    description: >-
+      Reusable block patterns and navigation menus. Both registered and reachable, but empty
+      (X-WP-Total 0) — the site is built with Elementor, not the block editor.
+  - name: search
+    description: Cross-content search across published posts and pages.
+  - name: discovery
+    description: Route, type, taxonomy and status discovery documents.
+  - name: oembed
+    description: oEmbed 1.0 provider endpoint for bioaegistherapeutics.com URLs.
+  - name: seo
+    description: >-
+      Yoast SEO head-tag rendering for a bioaegistherapeutics.com URL — the only anonymously
+      readable operation in the yoast/v1 namespace, and the carrier of the site's schema.org
+      JSON-LD graph.
+paths:
+  /:
+    get:
+      tags: [discovery]
+      operationId: getApiIndex
+      summary: Get the REST API index
+      description: >-
+        Returns the site index — name ("BioAegis Therapeutics"), description ("The Power of Innate
+        Immunity"), URL, home, the 17 registered namespaces, the supported authentication methods
+        (WordPress application passwords only) and the full 308-entry route table.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - name: namespace
+          in: query
+          description: Restrict the response to a single namespace.
+          schema:
+            type: string
+            examples: ['wp/v2']
+      responses:
+        '200':
+          description: Site index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiIndex'
+  /wp/v2:
+    get:
+      tags: [discovery]
+      operationId: getWpV2Index
+      summary: Get the wp/v2 namespace index
+      description: Returns the namespace document for `wp/v2` — its 114 routes and their supported methods and args.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: Namespace index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiIndex'
+  /wp/v2/posts:
+    get:
+      tags: [posts]
+      operationId: listPosts
+      summary: List posts
+      description: >-
+        Lists published posts, newest first. 153 items at harvest time. `content.rendered` and
+        `excerpt.rendered` are populated, so this operation returns full press-release prose. Page
+        size is capped at 100; total count and page count come back in `X-WP-Total` and
+        `X-WP-TotalPages`, and `Link` carries RFC 8288 `prev`/`next` relations.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/Before'
+        - $ref: '#/components/parameters/Exclude'
+        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Order'
+        - $ref: '#/components/parameters/Fields'
+        - name: slug
+          in: query
+          description: Limit the result set to posts with one or more specific slugs.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: categories
+          in: query
+          description: Limit the result set to posts assigned to specific category IDs.
+          schema:
+            type: array
+            items:
+              type: integer
+            examples: [[11]]
+          style: form
+          explode: false
+        - name: categories_exclude
+          in: query
+          description: Exclude posts assigned to specific category IDs.
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          explode: false
+        - name: orderby
+          in: query
+          description: Sort collection by post attribute.
+          schema:
+            type: string
+            enum: [author, date, id, include, modified, parent, relevance, slug, include_slugs, title]
+            default: date
+        - name: sticky
+          in: query
+          description: Limit the result set to sticky posts.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A page of posts
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+            Link:
+              $ref: '#/components/headers/LinkPagination'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /wp/v2/posts/{id}:
+    get:
+      tags: [posts]
+      operationId: getPost
+      summary: Get a post
+      description: Retrieves a single published post by its numeric ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier for the post.
+          schema:
+            type: integer
+            examples: [5904]
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: The post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          $ref: '#/components/responses/InvalidPostId'
+  /wp/v2/pages:
+    get:
+      tags: [pages]
+      operationId: listPages
+      summary: List pages
+      description: >-
+        Lists published pages. 14 items at harvest time. `content.rendered` is populated and can be
+        large — the Our Platform page returns ~100KB of rendered Elementor markup.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/Before'
+        - $ref: '#/components/parameters/Exclude'
+        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Order'
+        - $ref: '#/components/parameters/Fields'
+        - name: slug
+          in: query
+          description: Limit the result set to pages with one or more specific slugs.
+          schema:
+            type: array
+            items:
+              type: string
+            examples: [['about-us']]
+          style: form
+          explode: false
+        - name: parent
+          in: query
+          description: Limit the result set to pages with a specific parent ID.
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          explode: false
+        - name: menu_order
+          in: query
+          description: Limit the result set to pages with a specific menu order value.
+          schema:
+            type: integer
+        - name: orderby
+          in: query
+          description: Sort collection by page attribute.
+          schema:
+            type: string
+            enum: [author, date, id, include, modified, parent, relevance, slug, include_slugs, title, menu_order]
+            default: date
+      responses:
+        '200':
+          description: A page of pages
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+            Link:
+              $ref: '#/components/headers/LinkPagination'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Page'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /wp/v2/pages/{id}:
+    get:
+      tags: [pages]
+      operationId: getPage
+      summary: Get a page
+      description: Retrieves a single published page by its numeric ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier for the page.
+          schema:
+            type: integer
+            examples: [901]
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: The page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '404':
+          $ref: '#/components/responses/InvalidPostId'
+  /wp/v2/media:
+    get:
+      tags: [media]
+      operationId: listMedia
+      summary: List media
+      description: >-
+        Lists media library attachments. 247 items at harvest time — company logos, leadership
+        headshots, mechanism-of-action diagrams and press-release imagery. Each item carries
+        `source_url` plus a `media_details.sizes` map of generated renditions.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/Before'
+        - $ref: '#/components/parameters/Exclude'
+        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Order'
+        - $ref: '#/components/parameters/Fields'
+        - name: media_type
+          in: query
+          description: Limit the result set to attachments of a particular media type.
+          schema:
+            type: string
+            enum: [image, video, text, application, audio]
+        - name: mime_type
+          in: query
+          description: Limit the result set to attachments of a particular MIME type.
+          schema:
+            type: string
+            examples: ['image/webp']
+      responses:
+        '200':
+          description: A page of media items
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+            Link:
+              $ref: '#/components/headers/LinkPagination'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaItem'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /wp/v2/media/{id}:
+    get:
+      tags: [media]
+      operationId: getMediaItem
+      summary: Get a media item
+      description: >-
+        Retrieves a single attachment by ID. ID 2910 is the site logo referenced from the REST
+        index `site_logo` field.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier for the attachment.
+          schema:
+            type: integer
+            examples: [2910]
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: The media item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaItem'
+        '404':
+          $ref: '#/components/responses/InvalidPostId'
+  /wp/v2/categories:
+    get:
+      tags: [taxonomy]
+      operationId: listCategories
+      summary: List categories
+      description: >-
+        Lists terms in the hierarchical `category` taxonomy. 10 terms at harvest time — News (94),
+        Publication (34), Event (9), Clinical (6), Leadership (5), Board (4), Feature (2), COVID19
+        (1), Uncategorized (1) and Jobs (0). This taxonomy is how the site segments its content;
+        there are no post tags.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Exclude'
+        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/Order'
+        - $ref: '#/components/parameters/Fields'
+        - name: orderby
+          in: query
+          description: Sort collection by term attribute.
+          schema:
+            type: string
+            enum: [id, include, name, slug, include_slugs, term_group, description, count]
+            default: name
+        - name: hide_empty
+          in: query
+          description: Whether to hide terms not assigned to any posts.
+          schema:
+            type: boolean
+            default: false
+        - name: parent
+          in: query
+          description: Limit result set to terms assigned to a specific parent.
+          schema:
+            type: integer
+        - name: post
+          in: query
+          description: Limit result set to terms assigned to a specific post.
+          schema:
+            type: integer
+        - name: slug
+          in: query
+          description: Limit result set to terms with one or more specific slugs.
+          schema:
+            type: array
+            items:
+              type: string
+            examples: [['news']]
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: A page of category terms
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Term'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /wp/v2/categories/{id}:
+    get:
+      tags: [taxonomy]
+      operationId: getCategory
+      summary: Get a category
+      description: Retrieves a single category term by ID. ID 11 is News, the largest category.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier for the term.
+          schema:
+            type: integer
+            examples: [11]
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The category term
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+        '404':
+          $ref: '#/components/responses/InvalidTermId'
+  /wp/v2/tags:
+    get:
+      tags: [taxonomy]
+      operationId: listTags
+      summary: List tags
+      description: >-
+        Lists terms in the flat `post_tag` taxonomy. Registered and reachable, but empty
+        (X-WP-Total 0) — BioAegis classifies exclusively with categories.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Order'
+      responses:
+        '200':
+          description: A page of tag terms (empty on this deployment)
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Term'
+  /wp/v2/comments:
+    get:
+      tags: [comments]
+      operationId: listComments
+      summary: List comments
+      description: >-
+        Lists approved comments. Registered and reachable, but empty (X-WP-Total 0) — comments are
+        not used on this site.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Order'
+        - name: post
+          in: query
+          description: Limit result set to comments assigned to specific post IDs.
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: A page of comments (empty on this deployment)
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /wp/v2/blocks:
+    get:
+      tags: [blocks]
+      operationId: listBlocks
+      summary: List reusable blocks
+      description: >-
+        Lists reusable block patterns (`wp_block`). Registered and reachable, but empty
+        (X-WP-Total 0) — the site is authored in Elementor rather than the block editor.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: A page of reusable blocks (empty on this deployment)
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /wp/v2/navigation:
+    get:
+      tags: [blocks]
+      operationId: listNavigationMenus
+      summary: List navigation menus
+      description: >-
+        Lists block-editor navigation menus (`wp_navigation`). Registered and reachable, but empty
+        (X-WP-Total 0). The classic `/wp/v2/menus` and `/wp/v2/menu-locations` endpoints, which
+        would carry the real site navigation, return 401 `rest_cannot_view` anonymously.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: A page of navigation menus (empty on this deployment)
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /wp/v2/types:
+    get:
+      tags: [discovery]
+      operationId: listTypes
+      summary: List post types
+      description: >-
+        Returns the 13 registered post types keyed by slug — post, page, attachment,
+        nav_menu_item, wp_block, wp_template, wp_template_part, wp_global_styles, wp_navigation,
+        wp_font_family, wp_font_face, e-floating-buttons and elementor_library. Only post, page and
+        attachment carry public content on this deployment.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: Map of post types keyed by slug
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/PostType'
+  /wp/v2/types/{type}:
+    get:
+      tags: [discovery]
+      operationId: getType
+      summary: Get a post type
+      description: Retrieves the registration record for a single post type.
+      parameters:
+        - name: type
+          in: path
+          required: true
+          description: An alphanumeric identifier for the post type.
+          schema:
+            type: string
+            examples: ['post']
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The post type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostType'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+  /wp/v2/taxonomies:
+    get:
+      tags: [discovery]
+      operationId: listTaxonomies
+      summary: List taxonomies
+      description: >-
+        Returns the 4 registered taxonomies keyed by slug — `category` (hierarchical, on post),
+        `post_tag` (flat, on post), `nav_menu` (on nav_menu_item) and `wp_pattern_category` (on
+        wp_block).
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - name: type
+          in: query
+          description: Limit results to taxonomies associated with a specific post type.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Map of taxonomies keyed by slug
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Taxonomy'
+  /wp/v2/taxonomies/{taxonomy}:
+    get:
+      tags: [discovery]
+      operationId: getTaxonomy
+      summary: Get a taxonomy
+      description: Retrieves the registration record for a single taxonomy.
+      parameters:
+        - name: taxonomy
+          in: path
+          required: true
+          description: An alphanumeric identifier for the taxonomy.
+          schema:
+            type: string
+            examples: ['category']
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The taxonomy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Taxonomy'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+  /wp/v2/statuses:
+    get:
+      tags: [discovery]
+      operationId: listStatuses
+      summary: List post statuses
+      description: >-
+        Returns the post statuses visible to the caller keyed by slug. Anonymously this is a single
+        entry, `publish` — draft, pending, private, future and trash require authentication.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: Map of statuses keyed by slug
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Status'
+  /wp/v2/statuses/{status}:
+    get:
+      tags: [discovery]
+      operationId: getStatus
+      summary: Get a post status
+      description: Retrieves the registration record for a single post status.
+      parameters:
+        - name: status
+          in: path
+          required: true
+          description: An alphanumeric identifier for the status.
+          schema:
+            type: string
+            examples: ['publish']
+        - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+  /wp/v2/search:
+    get:
+      tags: [search]
+      operationId: searchContent
+      summary: Search content
+      description: >-
+        Cross-content search over published posts and pages, returning lightweight
+        {id, title, url, type, subtype, _links} records. A query for "gelsolin" returns 137
+        matches; a query for "ards" is the fastest route to the BTI-203 clinical-trial material.
+        This is the only full-text entry point on the surface — there is no dedicated site-search
+        API.
+      parameters:
+        - $ref: '#/components/parameters/Context'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - name: search
+          in: query
+          required: true
+          description: Limit results to those matching a string.
+          schema:
+            type: string
+            examples: ['gelsolin']
+        - name: type
+          in: query
+          description: Limit results to items of an object type.
+          schema:
+            type: string
+            enum: [post, term, post-format]
+            default: post
+        - name: subtype
+          in: query
+          description: Limit results to items of one or more object subtypes.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [post, page, any]
+            default: [any]
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: A page of search results
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /oembed/1.0/embed:
+    get:
+      tags: [oembed]
+      operationId: getOembed
+      summary: Get an oEmbed response for a URL
+      description: >-
+        The oEmbed 1.0 provider endpoint. Returns the oEmbed rich/link response for a
+        bioaegistherapeutics.com URL. The sibling `/oembed/1.0/proxy` endpoint, which would fetch
+        third-party URLs, returns 401 `rest_forbidden` anonymously.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The URL of the resource for which to fetch oEmbed data.
+          schema:
+            type: string
+            format: uri
+            examples: ['https://www.bioaegistherapeutics.com/']
+        - name: format
+          in: query
+          description: The oEmbed format to use.
+          schema:
+            type: string
+            enum: [json, xml]
+            default: json
+        - name: maxwidth
+          in: query
+          description: The maximum width of the embed frame in pixels.
+          schema:
+            type: integer
+            default: 600
+      responses:
+        '200':
+          description: oEmbed response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OembedResponse'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+  /yoast/v1/get_head:
+    get:
+      tags: [seo]
+      operationId: getYoastHead
+      summary: Get the rendered SEO head for a URL
+      description: >-
+        Renders the Yoast SEO head for a bioaegistherapeutics.com URL, returning both the raw HTML
+        (`html`) and a parsed object (`json`). The parsed object carries the canonical URL, robots
+        directives, Open Graph and Twitter card metadata, and — under `json.schema['@graph']` — the
+        site's schema.org JSON-LD graph (WebPage, BreadcrumbList, WebSite, Organization). This is
+        the richest structured-data source on the surface and the only anonymously readable
+        operation in the 53-route `yoast/v1` namespace.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The URL whose SEO head should be rendered.
+          schema:
+            type: string
+            format: uri
+            examples: ['https://www.bioaegistherapeutics.com/']
+      responses:
+        '200':
+          description: Rendered SEO head
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoastHead'
+components:
+  headers:
+    XWPTotal:
+      description: Total number of items in the collection.
+      schema:
+        type: integer
+        examples: [153]
+    XWPTotalPages:
+      description: Total number of pages available at the requested page size.
+      schema:
+        type: integer
+        examples: [153]
+    LinkPagination:
+      description: RFC 8288 Link header carrying `prev` and `next` relations for the collection.
+      schema:
+        type: string
+  parameters:
+    Context:
+      name: context
+      in: query
+      description: >-
+        Scope under which the request is made; determines fields present in the response.
+        Anonymous callers may only use `view` and `embed`.
+      schema:
+        type: string
+        enum: [view, embed, edit]
+        default: view
+    Page:
+      name: page
+      in: query
+      description: Current page of the collection (1-based).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PerPage:
+      name: per_page
+      in: query
+      description: Maximum number of items to be returned in the result set.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Search:
+      name: search
+      in: query
+      description: Limit results to those matching a string.
+      schema:
+        type: string
+    After:
+      name: after
+      in: query
+      description: Limit response to items published after a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Before:
+      name: before
+      in: query
+      description: Limit response to items published before a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Exclude:
+      name: exclude
+      in: query
+      description: Ensure result set excludes specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Include:
+      name: include
+      in: query
+      description: Limit result set to specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Offset:
+      name: offset
+      in: query
+      description: Offset the result set by a specific number of items.
+      schema:
+        type: integer
+    Order:
+      name: order
+      in: query
+      description: Order sort attribute ascending or descending.
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+    Fields:
+      name: _fields
+      in: query
+      description: >-
+        Comma-separated list of fields to limit the response to. The most effective way to keep
+        page-body responses small on this site, where `content.rendered` can exceed 100KB.
+      schema:
+        type: string
+        examples: ['id,slug,title,link,date,modified']
+      style: form
+      explode: false
+  responses:
+    InvalidParam:
+      description: A query parameter failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            perPageOutOfBounds:
+              value:
+                code: rest_invalid_param
+                message: 'Invalid parameter(s): per_page'
+                data:
+                  status: 400
+                  params:
+                    per_page: per_page must be between 1 (inclusive) and 100 (inclusive)
+    InvalidPostId:
+      description: No published object exists with that ID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            invalidPostId:
+              value:
+                code: rest_post_invalid_id
+                message: Invalid post ID.
+                data:
+                  status: 404
+    InvalidTermId:
+      description: No term exists with that ID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            invalidTermId:
+              value:
+                code: rest_term_invalid
+                message: Term does not exist.
+                data:
+                  status: 404
+    NoRoute:
+      description: No route matched the requested path and method.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            noRoute:
+              value:
+                code: rest_no_route
+                message: 'No route was found matching the URL and request method.'
+                data:
+                  status: 404
+  schemas:
+    RestError:
+      type: object
+      description: >-
+        The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as
+        `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is
+        duplicated inside `data.status`.
+      required: [code, message, data]
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples: ['rest_post_invalid_id']
+        message:
+          type: string
+          description: Human-readable message.
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code, repeated in the body.
+            params:
+              type: object
+              description: Per-parameter validation messages, present on rest_invalid_param.
+              additionalProperties:
+                type: string
+            details:
+              type: object
+              description: Per-parameter structured validation detail, present on rest_invalid_param.
+    RenderedText:
+      type: object
+      description: A rendered-HTML text field.
+      properties:
+        rendered:
+          type: string
+        protected:
+          type: boolean
+    Post:
+      type: object
+      description: >-
+        A published post. On this deployment `author` is an integer that cannot be resolved —
+        /wp/v2/users is blocked at the edge by the Sucuri WAF — and `tags` is always an empty
+        array.
+      properties:
+        id:
+          type: integer
+          examples: [5904]
+        date:
+          type: string
+          format: date-time
+        date_gmt:
+          type: string
+          format: date-time
+        guid:
+          $ref: '#/components/schemas/RenderedText'
+        modified:
+          type: string
+          format: date-time
+        modified_gmt:
+          type: string
+          format: date-time
+        slug:
+          type: string
+        status:
+          type: string
+          examples: ['publish']
+        type:
+          type: string
+          examples: ['post']
+        link:
+          type: string
+          format: uri
+        title:
+          $ref: '#/components/schemas/RenderedText'
+        content:
+          $ref: '#/components/schemas/RenderedText'
+        excerpt:
+          $ref: '#/components/schemas/RenderedText'
+        author:
+          type: integer
+          description: Author user ID. Not resolvable anonymously on this deployment.
+        featured_media:
+          type: integer
+          description: Attachment ID of the featured image; 0 when none. Resolvable via /wp/v2/media/{id}.
+        comment_status:
+          type: string
+        ping_status:
+          type: string
+        sticky:
+          type: boolean
+        template:
+          type: string
+        format:
+          type: string
+        meta:
+          type: object
+        categories:
+          type: array
+          description: Category term IDs. Resolvable via /wp/v2/categories/{id}.
+          items:
+            type: integer
+        tags:
+          type: array
+          description: Post tag term IDs. Always empty on this deployment.
+          items:
+            type: integer
+        class_list:
+          type: array
+          items:
+            type: string
+        yoast_head:
+          type: string
+          description: Pre-rendered SEO head HTML injected by the Yoast SEO plugin.
+        yoast_head_json:
+          type: object
+          description: Parsed SEO head, including the schema.org JSON-LD graph under `schema`.
+        _links:
+          type: object
+          description: HAL-style link relations — self, collection, about, author, replies, version-history, wp:attachment, wp:term, curies.
+    Page:
+      type: object
+      description: A published page. Same shape as Post, minus categories/tags/sticky/format, plus parent and menu_order.
+      properties:
+        id:
+          type: integer
+          examples: [901]
+        date:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        slug:
+          type: string
+        status:
+          type: string
+        type:
+          type: string
+          examples: ['page']
+        link:
+          type: string
+          format: uri
+        title:
+          $ref: '#/components/schemas/RenderedText'
+        content:
+          $ref: '#/components/schemas/RenderedText'
+        excerpt:
+          $ref: '#/components/schemas/RenderedText'
+        author:
+          type: integer
+        featured_media:
+          type: integer
+        parent:
+          type: integer
+          description: Parent page ID; 0 for top-level. Every page on this site is top-level.
+        menu_order:
+          type: integer
+        template:
+          type: string
+        meta:
+          type: object
+        yoast_head:
+          type: string
+        yoast_head_json:
+          type: object
+        _links:
+          type: object
+    MediaItem:
+      type: object
+      description: A media library attachment.
+      properties:
+        id:
+          type: integer
+          examples: [2910]
+        date:
+          type: string
+          format: date-time
+        slug:
+          type: string
+        type:
+          type: string
+          examples: ['attachment']
+        link:
+          type: string
+          format: uri
+        title:
+          $ref: '#/components/schemas/RenderedText'
+        author:
+          type: integer
+        caption:
+          $ref: '#/components/schemas/RenderedText'
+        alt_text:
+          type: string
+        media_type:
+          type: string
+          examples: ['image']
+        mime_type:
+          type: string
+          examples: ['image/webp']
+        media_details:
+          type: object
+          description: Width, height, file, filesize and the `sizes` map of generated renditions.
+        post:
+          type: integer
+          description: Post or page this attachment is attached to.
+        source_url:
+          type: string
+          format: uri
+        _links:
+          type: object
+    Term:
+      type: object
+      description: A taxonomy term.
+      properties:
+        id:
+          type: integer
+          examples: [11]
+        count:
+          type: integer
+          examples: [94]
+        description:
+          type: string
+        link:
+          type: string
+          format: uri
+        name:
+          type: string
+          examples: ['News']
+        slug:
+          type: string
+          examples: ['news']
+        taxonomy:
+          type: string
+          examples: ['category']
+        parent:
+          type: integer
+        meta:
+          type: object
+        _links:
+          type: object
+    PostType:
+      type: object
+      description: A registered post type.
+      properties:
+        capabilities:
+          type: object
+        description:
+          type: string
+        hierarchical:
+          type: boolean
+        has_archive:
+          oneOf:
+            - type: boolean
+            - type: string
+        name:
+          type: string
+        slug:
+          type: string
+        icon:
+          type: [string, 'null']
+        taxonomies:
+          type: array
+          items:
+            type: string
+        rest_base:
+          type: string
+        rest_namespace:
+          type: string
+        _links:
+          type: object
+    Taxonomy:
+      type: object
+      description: A registered taxonomy.
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+        hierarchical:
+          type: boolean
+        rest_base:
+          type: string
+        rest_namespace:
+          type: string
+        _links:
+          type: object
+    Status:
+      type: object
+      description: A registered post status.
+      properties:
+        name:
+          type: string
+          examples: ['Published']
+        private:
+          type: boolean
+        protected:
+          type: boolean
+        public:
+          type: boolean
+        queryable:
+          type: boolean
+        show_in_list:
+          type: boolean
+        slug:
+          type: string
+          examples: ['publish']
+        date_floating:
+          type: boolean
+        _links:
+          type: object
+    SearchResult:
+      type: object
+      description: A lightweight cross-content search hit.
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+          format: uri
+        type:
+          type: string
+          examples: ['post']
+        subtype:
+          type: string
+          examples: ['page']
+        _links:
+          type: object
+    OembedResponse:
+      type: object
+      description: An oEmbed 1.0 response document.
+      properties:
+        version:
+          type: string
+          examples: ['1.0']
+        provider_name:
+          type: string
+          examples: ['BioAegis Therapeutics']
+        provider_url:
+          type: string
+          format: uri
+        author_name:
+          type: string
+        author_url:
+          type: string
+          format: uri
+        title:
+          type: string
+        type:
+          type: string
+          examples: ['rich']
+        width:
+          type: integer
+        height:
+          type: [integer, 'null']
+        html:
+          type: string
+    YoastHead:
+      type: object
+      description: The Yoast SEO head-render response.
+      properties:
+        html:
+          type: string
+          description: Raw rendered head HTML.
+        json:
+          type: object
+          description: >-
+            Parsed head — title, description, robots, canonical, og_* and twitter_* fields, and the
+            schema.org JSON-LD graph under `schema['@graph']`.
+        status:
+          type: integer
+    ApiIndex:
+      type: object
+      description: The REST API index / namespace document.
+      properties:
+        name:
+          type: string
+          examples: ['BioAegis Therapeutics']
+        description:
+          type: string
+          examples: ['The Power of Innate Immunity']
+        url:
+          type: string
+          format: uri
+        home:
+          type: string
+          format: uri
+        gmt_offset:
+          type: string
+        timezone_string:
+          type: string
+        page_for_posts:
+          type: integer
+        page_on_front:
+          type: integer
+          examples: [901]
+        show_on_front:
+          type: string
+        namespaces:
+          type: array
+          items:
+            type: string
+        authentication:
+          type: object
+          description: Supported authentication methods. This deployment advertises WordPress application passwords only.
+        routes:
+          type: object
+        site_logo:
+          type: integer
+          examples: [2910]
+        site_icon_url:
+          type: string
+          format: uri
+        _links:
+          type: object

@@ -45,40 +45,18 @@ tags:
 - life-sciences
 - content-api
 apis:
-- aid: bioaegis-therapeutics:bioaegis-therapeutics-content-api
-  name: BioAegis Therapeutics Content API
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-blocks-api
+  name: BioAegis Therapeutics Blocks API
   description: >-
-    The anonymously readable WordPress REST API behind www.bioaegistherapeutics.com. It exposes the
-    153 published posts (94 News press releases, 34 Publications, 9 Events, 6 Clinical Advisory
-    Board profiles, 5 Leadership profiles, 4 Board profiles and 2 Feature entries), the 14
-    corporate pages (Home, About Us, Our Science, Our Platform, BTI-203 Clinical Trial, FAQs,
-    Publications, News, Careers, Contact Us, Expanded Access Policy, Code of Ethics/Conduct, Terms
-    of Use, Privacy Policy), the 247-item media library, the 10 registered categories, the post
-    types, taxonomies and statuses, cross-content search, the oEmbed 1.0 provider endpoint, and the
-    Yoast SEO head renderer that carries the site's schema.org JSON-LD graph. Unlike many WordPress
-    corporate sites, `content.rendered` and `excerpt.rendered` ARE populated on both posts and
-    pages, so this surface yields full prose as well as identity, hierarchy, dates and SEO
-    metadata. Two things a consumer must know. First, the site is fronted by a Sucuri CloudProxy
-    WAF: /wp/v2/users returns a 403 HTML interstitial from the edge rather than a JSON error, so
-    author identities are not resolvable and `author` on every record is an unresolvable integer.
-    Second, the `post_tag` taxonomy is registered but empty (0 terms) — all classification is
-    carried by the hierarchical `category` taxonomy. This is not a developer product BioAegis
-    Therapeutics markets; it is the site's own content surface, registered at /wp-json/ and
-    verified to return data without credentials. The OpenAPI in this repo is derived from the
-    published route index and covers only the operations that were confirmed to answer anonymously.
+    Reusable block patterns and navigation menus. Both registered and reachable, but empty (X-WP-Total
+    0) — the site is built with Elementor, not the block editor.
   humanURL: https://developer.wordpress.org/rest-api/
   baseURL: https://www.bioaegistherapeutics.com/wp-json
   tags:
-  - content
-  - wordpress
-  - corporate
-  - media
-  - press-releases
+  - blocks
   properties:
   - type: OpenAPI
-    url: openapi/bioaegis-therapeutics-content-openapi.yml
-  - type: Overlay
-    url: overlays/bioaegis-therapeutics-content-overlay.yaml
+    url: openapi/bioaegis-therapeutics-blocks-api-openapi.yml
   - type: Authentication
     url: authentication/bioaegis-therapeutics-authentication.yml
   - type: ErrorCatalog
@@ -89,31 +67,204 @@ apis:
     url: data-model/bioaegis-therapeutics-data-model.yml
   - type: JSONLD
     url: json-ld/bioaegis-therapeutics-json-ld.yml
-  x-contract-provenance: >-
-    Derived by the API Evangelist enrichment pipeline from the WordPress REST route index the site
-    publishes at https://www.bioaegistherapeutics.com/wp-json/ — 308 routes across the namespaces
-    oembed/1.0, redirection/v1, yoast/v1, elementor-one/v1, duplicate-post/v1, elementor/v1,
-    elementor-pro/v1, monsterinsights/v1, astra/v1, elementor/v1/documents, elementor-ai/v1,
-    elementor/v1/feedback, nps-survey/v1, wp/v2, wp-site-health/v1, wp-block-editor/v1 and
-    wp-abilities/v1 — and verified against live anonymous responses on 2026-08-07. Only the 23
-    operations that returned data without credentials are modelled. Notably the site registers the
-    WordPress Abilities API (`wp-abilities/v1`), an agent-facing capability registry, but
-    /wp-abilities/v1/abilities and /wp-abilities/v1/categories both return 401 rest_forbidden
-    anonymously, so no agent surface is claimed here. /wp/v2/users and /wp/v2/users/me return 403
-    from the Sucuri WAF, /wp/v2/settings returns 401 rest_forbidden, and themes, plugins, menus,
-    menu-locations, sidebars, widget-types, templates, template-parts, global-styles, block-types,
-    block-patterns, pattern-directory, font-collections, revisions and the oEmbed proxy all return
-    401. /wp/v2/comments, /wp/v2/tags, /wp/v2/blocks and /wp/v2/navigation return 200 with empty
-    collections. BioAegis Therapeutics publishes no developer documentation, no API reference, no
-    getting-started guide and no support channel for this surface, so no
-    Documentation/APIReference/GettingStarted pointers are emitted; the humanURL above is the
-    upstream WordPress REST handbook that defines the wp/v2 contract.
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-comments-api
+  name: BioAegis Therapeutics Comments API
+  description: Comment collection. Registered and reachable, but empty (X-WP-Total 0).
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - comments
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-comments-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-discovery-api
+  name: BioAegis Therapeutics Discovery API
+  description: Route, type, taxonomy and status discovery documents.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - discovery
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-discovery-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-media-api
+  name: BioAegis Therapeutics Media API
+  description: Media library — 247 attachments at harvest time.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - media
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-media-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-oembed-api
+  name: BioAegis Therapeutics Oembed API
+  description: oEmbed 1.0 provider endpoint for bioaegistherapeutics.com URLs.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - oembed
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-oembed-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-pages-api
+  name: BioAegis Therapeutics Pages API
+  description: >-
+    Corporate pages — 14 published at harvest time (Home, About Us, Our Science, Our Platform, BTI-203
+    Clinical Trial, FAQs, Publications, News, Careers, Contact Us, Expanded Access Policy, Code of Ethics/Conduct,
+    Terms of Use, Privacy Policy).
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - pages
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-pages-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-posts-api
+  name: BioAegis Therapeutics Posts API
+  description: >-
+    Post collection — 153 published items at harvest time, spanning News press releases (94), Publications
+    (34), Events (9), Clinical advisory board profiles (6), Leadership profiles (5), Board profiles (4),
+    Feature entries (2) and COVID19 (1).
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - posts
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-posts-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-search-api
+  name: BioAegis Therapeutics Search API
+  description: Cross-content search across published posts and pages.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - search
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-search-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-seo-api
+  name: BioAegis Therapeutics Seo API
+  description: >-
+    Yoast SEO head-tag rendering for a bioaegistherapeutics.com URL — the only anonymously readable operation
+    in the yoast/v1 namespace, and the carrier of the site's schema.org JSON-LD graph.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - seo
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-seo-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-taxonomy-api
+  name: BioAegis Therapeutics Taxonomy API
+  description: >-
+    Categories and tags. The hierarchical `category` taxonomy holds 10 terms and carries all classification;
+    the flat `post_tag` taxonomy is registered but empty (0 terms).
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - taxonomy
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-taxonomy-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/bioaegis-therapeutics-content-overlay.yaml
 - type: Website
   url: https://www.bioaegistherapeutics.com/
 - type: About

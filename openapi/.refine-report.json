@@ -1,0 +1,44 @@
+{
+  "provider": "bioaegis-therapeutics",
+  "sources": [
+    "bioaegis-therapeutics-blocks-api-openapi.yml",
+    "bioaegis-therapeutics-comments-api-openapi.yml",
+    "bioaegis-therapeutics-discovery-api-openapi.yml",
+    "bioaegis-therapeutics-media-api-openapi.yml",
+    "bioaegis-therapeutics-oembed-api-openapi.yml",
+    "bioaegis-therapeutics-pages-api-openapi.yml",
+    "bioaegis-therapeutics-posts-api-openapi.yml",
+    "bioaegis-therapeutics-search-api-openapi.yml",
+    "bioaegis-therapeutics-seo-api-openapi.yml",
+    "bioaegis-therapeutics-taxonomy-api-openapi.yml"
+  ],
+  "outputs": [
+    "bioaegis-therapeutics-blocks-api-openapi.yml",
+    "bioaegis-therapeutics-comments-api-openapi.yml",
+    "bioaegis-therapeutics-discovery-api-openapi.yml",
+    "bioaegis-therapeutics-media-api-openapi.yml",
+    "bioaegis-therapeutics-oembed-api-openapi.yml",
+    "bioaegis-therapeutics-pages-api-openapi.yml",
+    "bioaegis-therapeutics-posts-api-openapi.yml",
+    "bioaegis-therapeutics-search-api-openapi.yml",
+    "bioaegis-therapeutics-seo-api-openapi.yml",
+    "bioaegis-therapeutics-taxonomy-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "bioaegis-therapeutics-blocks-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-comments-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-discovery-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-media-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-oembed-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-pages-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-posts-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-search-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-seo-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "bioaegis-therapeutics-taxonomy-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": []
+}

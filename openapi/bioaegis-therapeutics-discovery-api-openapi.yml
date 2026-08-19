@@ -1,0 +1,382 @@
+openapi: 3.2.0
+info:
+  title: BioAegis Therapeutics Content Discovery API
+  version: wp/v2
+  summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  contact:
+    name: BioAegis Therapeutics
+    url: https://www.bioaegistherapeutics.com/contact-us/
+  x-api-evangelist-provenance: Derived by the API Evangelist enrichment pipeline from the live WordPress REST route index at https://www.bioaegistherapeutics.com/wp-json/ (308 routes across the namespaces oembed/1.0, redirection/v1, yoast/v1, elementor-one/v1, duplicate-post/v1, elementor/v1, elementor-pro/v1, monsterinsights/v1, astra/v1, elementor/v1/documents, elementor-ai/v1, elementor/v1/feedback, nps-survey/v1, wp/v2, wp-site-health/v1, wp-block-editor/v1 and wp-abilities/v1) and verified against live anonymous responses on 2026-08-07. Every parameter below appears verbatim in the route index `args` for that endpoint, and every operation modelled here returned 200 without credentials. The site is fronted by a Sucuri CloudProxy WAF, which answers /wp/v2/users and /wp/v2/users/me with a 403 HTML interstitial instead of a JSON error — the only place on this surface where the error envelope is not JSON. BioAegis Therapeutics publishes no OpenAPI, no developer documentation and no API reference for this surface; the humanURL in apis.yml points at the upstream WordPress REST handbook that defines the wp/v2 contract. Nothing here was obtained with credentials.
+  license:
+    name: Site content is © BioAegis Therapeutics, Inc. — see Terms of Use
+    url: https://www.bioaegistherapeutics.com/terms-of-use/
+servers:
+- url: https://www.bioaegistherapeutics.com/wp-json
+  description: Production content API
+tags:
+- name: discovery
+  description: Route, type, taxonomy and status discovery documents.
+paths:
+  /:
+    get:
+      tags:
+      - discovery
+      operationId: getApiIndex
+      summary: Get the REST API index
+      description: Returns the site index — name ("BioAegis Therapeutics"), description ("The Power of Innate Immunity"), URL, home, the 17 registered namespaces, the supported authentication methods (WordPress application passwords only) and the full 308-entry route table.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      - name: namespace
+        in: query
+        description: Restrict the response to a single namespace.
+        schema:
+          type: string
+          examples:
+          - wp/v2
+      responses:
+        '200':
+          description: Site index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiIndex'
+  /wp/v2:
+    get:
+      tags:
+      - discovery
+      operationId: getWpV2Index
+      summary: Get the wp/v2 namespace index
+      description: Returns the namespace document for `wp/v2` — its 114 routes and their supported methods and args.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: Namespace index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiIndex'
+  /wp/v2/types:
+    get:
+      tags:
+      - discovery
+      operationId: listTypes
+      summary: List post types
+      description: Returns the 13 registered post types keyed by slug — post, page, attachment, nav_menu_item, wp_block, wp_template, wp_template_part, wp_global_styles, wp_navigation, wp_font_family, wp_font_face, e-floating-buttons and elementor_library. Only post, page and attachment carry public content on this deployment.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: Map of post types keyed by slug
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/PostType'
+  /wp/v2/types/{type}:
+    get:
+      tags:
+      - discovery
+      operationId: getType
+      summary: Get a post type
+      description: Retrieves the registration record for a single post type.
+      parameters:
+      - name: type
+        in: path
+        required: true
+        description: An alphanumeric identifier for the post type.
+        schema:
+          type: string
+          examples:
+          - post
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The post type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostType'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+  /wp/v2/taxonomies:
+    get:
+      tags:
+      - discovery
+      operationId: listTaxonomies
+      summary: List taxonomies
+      description: Returns the 4 registered taxonomies keyed by slug — `category` (hierarchical, on post), `post_tag` (flat, on post), `nav_menu` (on nav_menu_item) and `wp_pattern_category` (on wp_block).
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      - name: type
+        in: query
+        description: Limit results to taxonomies associated with a specific post type.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Map of taxonomies keyed by slug
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Taxonomy'
+  /wp/v2/taxonomies/{taxonomy}:
+    get:
+      tags:
+      - discovery
+      operationId: getTaxonomy
+      summary: Get a taxonomy
+      description: Retrieves the registration record for a single taxonomy.
+      parameters:
+      - name: taxonomy
+        in: path
+        required: true
+        description: An alphanumeric identifier for the taxonomy.
+        schema:
+          type: string
+          examples:
+          - category
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The taxonomy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Taxonomy'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+  /wp/v2/statuses:
+    get:
+      tags:
+      - discovery
+      operationId: listStatuses
+      summary: List post statuses
+      description: Returns the post statuses visible to the caller keyed by slug. Anonymously this is a single entry, `publish` — draft, pending, private, future and trash require authentication.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: Map of statuses keyed by slug
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Status'
+  /wp/v2/statuses/{status}:
+    get:
+      tags:
+      - discovery
+      operationId: getStatus
+      summary: Get a post status
+      description: Retrieves the registration record for a single post status.
+      parameters:
+      - name: status
+        in: path
+        required: true
+        description: An alphanumeric identifier for the status.
+        schema:
+          type: string
+          examples:
+          - publish
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '404':
+          $ref: '#/components/responses/NoRoute'
+components:
+  schemas:
+    Status:
+      type: object
+      description: A registered post status.
+      properties:
+        name:
+          type: string
+          examples:
+          - Published
+        private:
+          type: boolean
+        protected:
+          type: boolean
+        public:
+          type: boolean
+        queryable:
+          type: boolean
+        show_in_list:
+          type: boolean
+        slug:
+          type: string
+          examples:
+          - publish
+        date_floating:
+          type: boolean
+        _links:
+          type: object
+    Taxonomy:
+      type: object
+      description: A registered taxonomy.
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+        hierarchical:
+          type: boolean
+        rest_base:
+          type: string
+        rest_namespace:
+          type: string
+        _links:
+          type: object
+    PostType:
+      type: object
+      description: A registered post type.
+      properties:
+        capabilities:
+          type: object
+        description:
+          type: string
+        hierarchical:
+          type: boolean
+        has_archive:
+          oneOf:
+          - type: boolean
+          - type: string
+        name:
+          type: string
+        slug:
+          type: string
+        icon:
+          type:
+          - string
+          - 'null'
+        taxonomies:
+          type: array
+          items:
+            type: string
+        rest_base:
+          type: string
+        rest_namespace:
+          type: string
+        _links:
+          type: object
+    ApiIndex:
+      type: object
+      description: The REST API index / namespace document.
+      properties:
+        name:
+          type: string
+          examples:
+          - BioAegis Therapeutics
+        description:
+          type: string
+          examples:
+          - The Power of Innate Immunity
+        url:
+          type: string
+          format: uri
+        home:
+          type: string
+          format: uri
+        gmt_offset:
+          type: string
+        timezone_string:
+          type: string
+        page_for_posts:
+          type: integer
+        page_on_front:
+          type: integer
+          examples:
+          - 901
+        show_on_front:
+          type: string
+        namespaces:
+          type: array
+          items:
+            type: string
+        authentication:
+          type: object
+          description: Supported authentication methods. This deployment advertises WordPress application passwords only.
+        routes:
+          type: object
+        site_logo:
+          type: integer
+          examples:
+          - 2910
+        site_icon_url:
+          type: string
+          format: uri
+        _links:
+          type: object
+    RestError:
+      type: object
+      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
+      required:
+      - code
+      - message
+      - data
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples:
+          - rest_post_invalid_id
+        message:
+          type: string
+          description: Human-readable message.
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code, repeated in the body.
+            params:
+              type: object
+              description: Per-parameter validation messages, present on rest_invalid_param.
+              additionalProperties:
+                type: string
+            details:
+              type: object
+              description: Per-parameter structured validation detail, present on rest_invalid_param.
+  parameters:
+    Context:
+      name: context
+      in: query
+      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
+      schema:
+        type: string
+        enum:
+        - view
+        - embed
+        - edit
+        default: view
+  responses:
+    NoRoute:
+      description: No route matched the requested path and method.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            noRoute:
+              value:
+                code: rest_no_route
+                message: No route was found matching the URL and request method.
+                data:
+                  status: 404

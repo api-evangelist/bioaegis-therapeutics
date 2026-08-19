@@ -1,0 +1,49 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "BioAegis Therapeutics Content Oembed API",
+    "version": "wp/v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "oembed",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get an oEmbed response for a URL",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/oembed/1.0/embed",
+            "params": [
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "The URL of the resource for which to fetch oEmbed data."
+              },
+              {
+                "name": "format",
+                "value": "",
+                "type": "query",
+                "description": "The oEmbed format to use."
+              },
+              {
+                "name": "maxwidth",
+                "value": "",
+                "type": "query",
+                "description": "The maximum width of the embed frame in pixels."
+              }
+            ]
+          },
+          "docs": "The oEmbed 1.0 provider endpoint. Returns the oEmbed rich/link response for a bioaegistherapeutics.com URL. The sibling `/oembed/1.0/proxy` endpoint, which would fetch third-party URLs, returns 401 `rest_forbidden` anonymously."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

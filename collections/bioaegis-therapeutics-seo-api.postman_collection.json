@@ -1,0 +1,118 @@
+{
+  "item": [
+    {
+      "id": "5e2a79fd-f4f5-44f3-a76c-7ee0c0a46290",
+      "name": "seo",
+      "description": {
+        "content": "Yoast SEO head-tag rendering for a bioaegistherapeutics.com URL — the only anonymously readable operation in the yoast/v1 namespace, and the carrier of the site's schema.org JSON-LD graph.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "1e639030-22a3-42e7-a0b2-dd493fbe1ae4",
+          "name": "Get the rendered SEO head for a URL",
+          "request": {
+            "name": "Get the rendered SEO head for a URL",
+            "description": {
+              "content": "Renders the Yoast SEO head for a bioaegistherapeutics.com URL, returning both the raw HTML (`html`) and a parsed object (`json`). The parsed object carries the canonical URL, robots directives, Open Graph and Twitter card metadata, and — under `json.schema['@graph']` — the site's schema.org JSON-LD graph (WebPage, BreadcrumbList, WebSite, Organization). This is the richest structured-data source on the surface and the only anonymously readable operation in the 53-route `yoast/v1` namespace.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "yoast",
+                "v1",
+                "get_head"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "url",
+                  "value": "<uri>",
+                  "description": "(Required) The URL whose SEO head should be rendered."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "9f135066-18dc-4d07-8168-50815af1d9c5",
+              "name": "Rendered SEO head",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "yoast",
+                    "v1",
+                    "get_head"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "url",
+                      "value": "<uri>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"html\": \"string\",\n  \"json\": {},\n  \"status\": 7940\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://www.bioaegistherapeutics.com/wp-json",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "48a55e60-52b0-4d39-9ee6-bfe6fb84d086",
+    "name": "BioAegis Therapeutics Content Seo API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.\n\nContact Support:\n Name: BioAegis Therapeutics",
+      "type": "text/plain"
+    }
+  }
+}

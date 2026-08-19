@@ -1,0 +1,398 @@
+openapi: 3.2.0
+info:
+  title: BioAegis Therapeutics Content Posts API
+  version: wp/v2
+  summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  contact:
+    name: BioAegis Therapeutics
+    url: https://www.bioaegistherapeutics.com/contact-us/
+  x-api-evangelist-provenance: Derived by the API Evangelist enrichment pipeline from the live WordPress REST route index at https://www.bioaegistherapeutics.com/wp-json/ (308 routes across the namespaces oembed/1.0, redirection/v1, yoast/v1, elementor-one/v1, duplicate-post/v1, elementor/v1, elementor-pro/v1, monsterinsights/v1, astra/v1, elementor/v1/documents, elementor-ai/v1, elementor/v1/feedback, nps-survey/v1, wp/v2, wp-site-health/v1, wp-block-editor/v1 and wp-abilities/v1) and verified against live anonymous responses on 2026-08-07. Every parameter below appears verbatim in the route index `args` for that endpoint, and every operation modelled here returned 200 without credentials. The site is fronted by a Sucuri CloudProxy WAF, which answers /wp/v2/users and /wp/v2/users/me with a 403 HTML interstitial instead of a JSON error — the only place on this surface where the error envelope is not JSON. BioAegis Therapeutics publishes no OpenAPI, no developer documentation and no API reference for this surface; the humanURL in apis.yml points at the upstream WordPress REST handbook that defines the wp/v2 contract. Nothing here was obtained with credentials.
+  license:
+    name: Site content is © BioAegis Therapeutics, Inc. — see Terms of Use
+    url: https://www.bioaegistherapeutics.com/terms-of-use/
+servers:
+- url: https://www.bioaegistherapeutics.com/wp-json
+  description: Production content API
+tags:
+- name: posts
+  description: Post collection — 153 published items at harvest time, spanning News press releases (94), Publications (34), Events (9), Clinical advisory board profiles (6), Leadership profiles (5), Board profiles (4), Feature entries (2) and COVID19 (1).
+paths:
+  /wp/v2/posts:
+    get:
+      tags:
+      - posts
+      operationId: listPosts
+      summary: List posts
+      description: Lists published posts, newest first. 153 items at harvest time. `content.rendered` and `excerpt.rendered` are populated, so this operation returns full press-release prose. Page size is capped at 100; total count and page count come back in `X-WP-Total` and `X-WP-TotalPages`, and `Link` carries RFC 8288 `prev`/`next` relations.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Search'
+      - $ref: '#/components/parameters/After'
+      - $ref: '#/components/parameters/Before'
+      - $ref: '#/components/parameters/Exclude'
+      - $ref: '#/components/parameters/Include'
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Order'
+      - $ref: '#/components/parameters/Fields'
+      - name: slug
+        in: query
+        description: Limit the result set to posts with one or more specific slugs.
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: false
+      - name: categories
+        in: query
+        description: Limit the result set to posts assigned to specific category IDs.
+        schema:
+          type: array
+          items:
+            type: integer
+          examples:
+          - - 11
+        style: form
+        explode: false
+      - name: categories_exclude
+        in: query
+        description: Exclude posts assigned to specific category IDs.
+        schema:
+          type: array
+          items:
+            type: integer
+        style: form
+        explode: false
+      - name: orderby
+        in: query
+        description: Sort collection by post attribute.
+        schema:
+          type: string
+          enum:
+          - author
+          - date
+          - id
+          - include
+          - modified
+          - parent
+          - relevance
+          - slug
+          - include_slugs
+          - title
+          default: date
+      - name: sticky
+        in: query
+        description: Limit the result set to sticky posts.
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: A page of posts
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+            Link:
+              $ref: '#/components/headers/LinkPagination'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /wp/v2/posts/{id}:
+    get:
+      tags:
+      - posts
+      operationId: getPost
+      summary: Get a post
+      description: Retrieves a single published post by its numeric ID.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Unique identifier for the post.
+        schema:
+          type: integer
+          examples:
+          - 5904
+      - $ref: '#/components/parameters/Context'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: The post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          $ref: '#/components/responses/InvalidPostId'
+components:
+  schemas:
+    Post:
+      type: object
+      description: A published post. On this deployment `author` is an integer that cannot be resolved — /wp/v2/users is blocked at the edge by the Sucuri WAF — and `tags` is always an empty array.
+      properties:
+        id:
+          type: integer
+          examples:
+          - 5904
+        date:
+          type: string
+          format: date-time
+        date_gmt:
+          type: string
+          format: date-time
+        guid:
+          $ref: '#/components/schemas/RenderedText'
+        modified:
+          type: string
+          format: date-time
+        modified_gmt:
+          type: string
+          format: date-time
+        slug:
+          type: string
+        status:
+          type: string
+          examples:
+          - publish
+        type:
+          type: string
+          examples:
+          - post
+        link:
+          type: string
+          format: uri
+        title:
+          $ref: '#/components/schemas/RenderedText'
+        content:
+          $ref: '#/components/schemas/RenderedText'
+        excerpt:
+          $ref: '#/components/schemas/RenderedText'
+        author:
+          type: integer
+          description: Author user ID. Not resolvable anonymously on this deployment.
+        featured_media:
+          type: integer
+          description: Attachment ID of the featured image; 0 when none. Resolvable via /wp/v2/media/{id}.
+        comment_status:
+          type: string
+        ping_status:
+          type: string
+        sticky:
+          type: boolean
+        template:
+          type: string
+        format:
+          type: string
+        meta:
+          type: object
+        categories:
+          type: array
+          description: Category term IDs. Resolvable via /wp/v2/categories/{id}.
+          items:
+            type: integer
+        tags:
+          type: array
+          description: Post tag term IDs. Always empty on this deployment.
+          items:
+            type: integer
+        class_list:
+          type: array
+          items:
+            type: string
+        yoast_head:
+          type: string
+          description: Pre-rendered SEO head HTML injected by the Yoast SEO plugin.
+        yoast_head_json:
+          type: object
+          description: Parsed SEO head, including the schema.org JSON-LD graph under `schema`.
+        _links:
+          type: object
+          description: HAL-style link relations — self, collection, about, author, replies, version-history, wp:attachment, wp:term, curies.
+    RenderedText:
+      type: object
+      description: A rendered-HTML text field.
+      properties:
+        rendered:
+          type: string
+        protected:
+          type: boolean
+    RestError:
+      type: object
+      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
+      required:
+      - code
+      - message
+      - data
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples:
+          - rest_post_invalid_id
+        message:
+          type: string
+          description: Human-readable message.
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code, repeated in the body.
+            params:
+              type: object
+              description: Per-parameter validation messages, present on rest_invalid_param.
+              additionalProperties:
+                type: string
+            details:
+              type: object
+              description: Per-parameter structured validation detail, present on rest_invalid_param.
+  headers:
+    XWPTotal:
+      description: Total number of items in the collection.
+      schema:
+        type: integer
+        examples:
+        - 153
+    LinkPagination:
+      description: RFC 8288 Link header carrying `prev` and `next` relations for the collection.
+      schema:
+        type: string
+    XWPTotalPages:
+      description: Total number of pages available at the requested page size.
+      schema:
+        type: integer
+        examples:
+        - 153
+  parameters:
+    Search:
+      name: search
+      in: query
+      description: Limit results to those matching a string.
+      schema:
+        type: string
+    Fields:
+      name: _fields
+      in: query
+      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
+      schema:
+        type: string
+        examples:
+        - id,slug,title,link,date,modified
+      style: form
+      explode: false
+    Include:
+      name: include
+      in: query
+      description: Limit result set to specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Before:
+      name: before
+      in: query
+      description: Limit response to items published before a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Order:
+      name: order
+      in: query
+      description: Order sort attribute ascending or descending.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    Exclude:
+      name: exclude
+      in: query
+      description: Ensure result set excludes specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Offset:
+      name: offset
+      in: query
+      description: Offset the result set by a specific number of items.
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      description: Maximum number of items to be returned in the result set.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Context:
+      name: context
+      in: query
+      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
+      schema:
+        type: string
+        enum:
+        - view
+        - embed
+        - edit
+        default: view
+    Page:
+      name: page
+      in: query
+      description: Current page of the collection (1-based).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    After:
+      name: after
+      in: query
+      description: Limit response to items published after a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+  responses:
+    InvalidParam:
+      description: A query parameter failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            perPageOutOfBounds:
+              value:
+                code: rest_invalid_param
+                message: 'Invalid parameter(s): per_page'
+                data:
+                  status: 400
+                  params:
+                    per_page: per_page must be between 1 (inclusive) and 100 (inclusive)
+    InvalidPostId:
+      description: No published object exists with that ID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            invalidPostId:
+              value:
+                code: rest_post_invalid_id
+                message: Invalid post ID.
+                data:
+                  status: 404

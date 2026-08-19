@@ -1,0 +1,329 @@
+openapi: 3.2.0
+info:
+  title: BioAegis Therapeutics Content Taxonomy API
+  version: wp/v2
+  summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  contact:
+    name: BioAegis Therapeutics
+    url: https://www.bioaegistherapeutics.com/contact-us/
+  x-api-evangelist-provenance: Derived by the API Evangelist enrichment pipeline from the live WordPress REST route index at https://www.bioaegistherapeutics.com/wp-json/ (308 routes across the namespaces oembed/1.0, redirection/v1, yoast/v1, elementor-one/v1, duplicate-post/v1, elementor/v1, elementor-pro/v1, monsterinsights/v1, astra/v1, elementor/v1/documents, elementor-ai/v1, elementor/v1/feedback, nps-survey/v1, wp/v2, wp-site-health/v1, wp-block-editor/v1 and wp-abilities/v1) and verified against live anonymous responses on 2026-08-07. Every parameter below appears verbatim in the route index `args` for that endpoint, and every operation modelled here returned 200 without credentials. The site is fronted by a Sucuri CloudProxy WAF, which answers /wp/v2/users and /wp/v2/users/me with a 403 HTML interstitial instead of a JSON error — the only place on this surface where the error envelope is not JSON. BioAegis Therapeutics publishes no OpenAPI, no developer documentation and no API reference for this surface; the humanURL in apis.yml points at the upstream WordPress REST handbook that defines the wp/v2 contract. Nothing here was obtained with credentials.
+  license:
+    name: Site content is © BioAegis Therapeutics, Inc. — see Terms of Use
+    url: https://www.bioaegistherapeutics.com/terms-of-use/
+servers:
+- url: https://www.bioaegistherapeutics.com/wp-json
+  description: Production content API
+tags:
+- name: taxonomy
+  description: Categories and tags. The hierarchical `category` taxonomy holds 10 terms and carries all classification; the flat `post_tag` taxonomy is registered but empty (0 terms).
+paths:
+  /wp/v2/categories:
+    get:
+      tags:
+      - taxonomy
+      operationId: listCategories
+      summary: List categories
+      description: Lists terms in the hierarchical `category` taxonomy. 10 terms at harvest time — News (94), Publication (34), Event (9), Clinical (6), Leadership (5), Board (4), Feature (2), COVID19 (1), Uncategorized (1) and Jobs (0). This taxonomy is how the site segments its content; there are no post tags.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Search'
+      - $ref: '#/components/parameters/Exclude'
+      - $ref: '#/components/parameters/Include'
+      - $ref: '#/components/parameters/Order'
+      - $ref: '#/components/parameters/Fields'
+      - name: orderby
+        in: query
+        description: Sort collection by term attribute.
+        schema:
+          type: string
+          enum:
+          - id
+          - include
+          - name
+          - slug
+          - include_slugs
+          - term_group
+          - description
+          - count
+          default: name
+      - name: hide_empty
+        in: query
+        description: Whether to hide terms not assigned to any posts.
+        schema:
+          type: boolean
+          default: false
+      - name: parent
+        in: query
+        description: Limit result set to terms assigned to a specific parent.
+        schema:
+          type: integer
+      - name: post
+        in: query
+        description: Limit result set to terms assigned to a specific post.
+        schema:
+          type: integer
+      - name: slug
+        in: query
+        description: Limit result set to terms with one or more specific slugs.
+        schema:
+          type: array
+          items:
+            type: string
+          examples:
+          - - news
+        style: form
+        explode: false
+      responses:
+        '200':
+          description: A page of category terms
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+            X-WP-TotalPages:
+              $ref: '#/components/headers/XWPTotalPages'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Term'
+        '400':
+          $ref: '#/components/responses/InvalidParam'
+  /wp/v2/categories/{id}:
+    get:
+      tags:
+      - taxonomy
+      operationId: getCategory
+      summary: Get a category
+      description: Retrieves a single category term by ID. ID 11 is News, the largest category.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Unique identifier for the term.
+        schema:
+          type: integer
+          examples:
+          - 11
+      - $ref: '#/components/parameters/Context'
+      responses:
+        '200':
+          description: The category term
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+        '404':
+          $ref: '#/components/responses/InvalidTermId'
+  /wp/v2/tags:
+    get:
+      tags:
+      - taxonomy
+      operationId: listTags
+      summary: List tags
+      description: Lists terms in the flat `post_tag` taxonomy. Registered and reachable, but empty (X-WP-Total 0) — BioAegis classifies exclusively with categories.
+      parameters:
+      - $ref: '#/components/parameters/Context'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Search'
+      - $ref: '#/components/parameters/Order'
+      responses:
+        '200':
+          description: A page of tag terms (empty on this deployment)
+          headers:
+            X-WP-Total:
+              $ref: '#/components/headers/XWPTotal'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Term'
+components:
+  headers:
+    XWPTotalPages:
+      description: Total number of pages available at the requested page size.
+      schema:
+        type: integer
+        examples:
+        - 153
+    XWPTotal:
+      description: Total number of items in the collection.
+      schema:
+        type: integer
+        examples:
+        - 153
+  responses:
+    InvalidParam:
+      description: A query parameter failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            perPageOutOfBounds:
+              value:
+                code: rest_invalid_param
+                message: 'Invalid parameter(s): per_page'
+                data:
+                  status: 400
+                  params:
+                    per_page: per_page must be between 1 (inclusive) and 100 (inclusive)
+    InvalidTermId:
+      description: No term exists with that ID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+          examples:
+            invalidTermId:
+              value:
+                code: rest_term_invalid
+                message: Term does not exist.
+                data:
+                  status: 404
+  parameters:
+    PerPage:
+      name: per_page
+      in: query
+      description: Maximum number of items to be returned in the result set.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Exclude:
+      name: exclude
+      in: query
+      description: Ensure result set excludes specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Context:
+      name: context
+      in: query
+      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
+      schema:
+        type: string
+        enum:
+        - view
+        - embed
+        - edit
+        default: view
+    Page:
+      name: page
+      in: query
+      description: Current page of the collection (1-based).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Search:
+      name: search
+      in: query
+      description: Limit results to those matching a string.
+      schema:
+        type: string
+    Order:
+      name: order
+      in: query
+      description: Order sort attribute ascending or descending.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
+    Fields:
+      name: _fields
+      in: query
+      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
+      schema:
+        type: string
+        examples:
+        - id,slug,title,link,date,modified
+      style: form
+      explode: false
+    Include:
+      name: include
+      in: query
+      description: Limit result set to specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+  schemas:
+    Term:
+      type: object
+      description: A taxonomy term.
+      properties:
+        id:
+          type: integer
+          examples:
+          - 11
+        count:
+          type: integer
+          examples:
+          - 94
+        description:
+          type: string
+        link:
+          type: string
+          format: uri
+        name:
+          type: string
+          examples:
+          - News
+        slug:
+          type: string
+          examples:
+          - news
+        taxonomy:
+          type: string
+          examples:
+          - category
+        parent:
+          type: integer
+        meta:
+          type: object
+        _links:
+          type: object
+    RestError:
+      type: object
+      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
+      required:
+      - code
+      - message
+      - data
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples:
+          - rest_post_invalid_id
+        message:
+          type: string
+          description: Human-readable message.
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code, repeated in the body.
+            params:
+              type: object
+              description: Per-parameter validation messages, present on rest_invalid_param.
+              additionalProperties:
+                type: string
+            details:
+              type: object
+              description: Per-parameter structured validation detail, present on rest_invalid_param.

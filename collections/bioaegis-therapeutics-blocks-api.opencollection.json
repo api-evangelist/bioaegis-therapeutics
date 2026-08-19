@@ -1,0 +1,80 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "BioAegis Therapeutics Content Blocks API",
+    "version": "wp/v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "blocks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List reusable blocks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/blocks",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Current page of the collection (1-based)."
+              },
+              {
+                "name": "per_page",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of items to be returned in the result set."
+              }
+            ]
+          },
+          "docs": "Lists reusable block patterns (`wp_block`). Registered and reachable, but empty (X-WP-Total 0) — the site is authored in Elementor rather than the block editor."
+        },
+        {
+          "info": {
+            "name": "List navigation menus",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/navigation",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Current page of the collection (1-based)."
+              },
+              {
+                "name": "per_page",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of items to be returned in the result set."
+              }
+            ]
+          },
+          "docs": "Lists block-editor navigation menus (`wp_navigation`). Registered and reachable, but empty (X-WP-Total 0). The classic `/wp/v2/menus` and `/wp/v2/menu-locations` endpoints, which would carry the real site navigation, return 401 `rest_cannot_view` anonymously."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

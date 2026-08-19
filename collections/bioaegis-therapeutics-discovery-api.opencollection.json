@@ -1,0 +1,200 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "BioAegis Therapeutics Content Discovery API",
+    "version": "wp/v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "discovery",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get the REST API index",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              },
+              {
+                "name": "namespace",
+                "value": "",
+                "type": "query",
+                "description": "Restrict the response to a single namespace."
+              }
+            ]
+          },
+          "docs": "Returns the site index — name (\"BioAegis Therapeutics\"), description (\"The Power of Innate Immunity\"), URL, home, the 17 registered namespaces, the supported authentication methods (WordPress application passwords only) and the full 308-entry route table."
+        },
+        {
+          "info": {
+            "name": "Get the wp/v2 namespace index",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              }
+            ]
+          },
+          "docs": "Returns the namespace document for `wp/v2` — its 114 routes and their supported methods and args."
+        },
+        {
+          "info": {
+            "name": "List post types",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/types",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              }
+            ]
+          },
+          "docs": "Returns the 13 registered post types keyed by slug — post, page, attachment, nav_menu_item, wp_block, wp_template, wp_template_part, wp_global_styles, wp_navigation, wp_font_family, wp_font_face, e-floating-buttons and elementor_library. Only post, page and attachment carry public content on this deployment."
+        },
+        {
+          "info": {
+            "name": "Get a post type",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/types/:type",
+            "params": [
+              {
+                "name": "type",
+                "value": "",
+                "type": "path",
+                "description": "An alphanumeric identifier for the post type."
+              },
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              }
+            ]
+          },
+          "docs": "Retrieves the registration record for a single post type."
+        },
+        {
+          "info": {
+            "name": "List taxonomies",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/taxonomies",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "Limit results to taxonomies associated with a specific post type."
+              }
+            ]
+          },
+          "docs": "Returns the 4 registered taxonomies keyed by slug — `category` (hierarchical, on post), `post_tag` (flat, on post), `nav_menu` (on nav_menu_item) and `wp_pattern_category` (on wp_block)."
+        },
+        {
+          "info": {
+            "name": "Get a taxonomy",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/taxonomies/:taxonomy",
+            "params": [
+              {
+                "name": "taxonomy",
+                "value": "",
+                "type": "path",
+                "description": "An alphanumeric identifier for the taxonomy."
+              },
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              }
+            ]
+          },
+          "docs": "Retrieves the registration record for a single taxonomy."
+        },
+        {
+          "info": {
+            "name": "List post statuses",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/statuses",
+            "params": [
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              }
+            ]
+          },
+          "docs": "Returns the post statuses visible to the caller keyed by slug. Anonymously this is a single entry, `publish` — draft, pending, private, future and trash require authentication."
+        },
+        {
+          "info": {
+            "name": "Get a post status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://www.bioaegistherapeutics.com/wp-json/wp/v2/statuses/:status",
+            "params": [
+              {
+                "name": "status",
+                "value": "",
+                "type": "path",
+                "description": "An alphanumeric identifier for the status."
+              },
+              {
+                "name": "context",
+                "value": "",
+                "type": "query",
+                "description": "Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`."
+              }
+            ]
+          },
+          "docs": "Retrieves the registration record for a single post status."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

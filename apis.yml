@@ -176,28 +176,6 @@ apis:
     url: data-model/bioaegis-therapeutics-data-model.yml
   - type: JSONLD
     url: json-ld/bioaegis-therapeutics-json-ld.yml
-- aid: bioaegis-therapeutics:bioaegis-therapeutics-oembed-api
-  name: BioAegis Therapeutics Oembed API
-  description: oEmbed 1.0 provider endpoint for bioaegistherapeutics.com URLs.
-  humanURL: https://developer.wordpress.org/rest-api/
-  baseURL: https://www.bioaegistherapeutics.com/wp-json
-  tags:
-  - oEmbed
-  tags_raw:
-  - oembed
-  properties:
-  - type: OpenAPI
-    url: openapi/bioaegis-therapeutics-oembed-api-openapi.yml
-  - type: Authentication
-    url: authentication/bioaegis-therapeutics-authentication.yml
-  - type: ErrorCatalog
-    url: errors/bioaegis-therapeutics-problem-types.yml
-  - type: Conventions
-    url: conventions/bioaegis-therapeutics-conventions.yml
-  - type: DataModel
-    url: data-model/bioaegis-therapeutics-data-model.yml
-  - type: JSONLD
-    url: json-ld/bioaegis-therapeutics-json-ld.yml
 - aid: bioaegis-therapeutics:bioaegis-therapeutics-pages-api
   name: BioAegis Therapeutics Pages API
   description: >-
@@ -308,6 +286,26 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/bioaegis-therapeutics-taxonomy-api-openapi.yml
+  - type: Authentication
+    url: authentication/bioaegis-therapeutics-authentication.yml
+  - type: ErrorCatalog
+    url: errors/bioaegis-therapeutics-problem-types.yml
+  - type: Conventions
+    url: conventions/bioaegis-therapeutics-conventions.yml
+  - type: DataModel
+    url: data-model/bioaegis-therapeutics-data-model.yml
+  - type: JSONLD
+    url: json-ld/bioaegis-therapeutics-json-ld.yml
+- aid: bioaegis-therapeutics:bioaegis-therapeutics-o-embed-api
+  name: BioAegis Therapeutics o Embed API
+  description: oEmbed 1.0 provider endpoint for bioaegistherapeutics.com URLs.
+  humanURL: https://developer.wordpress.org/rest-api/
+  baseURL: https://www.bioaegistherapeutics.com/wp-json
+  tags:
+  - o Embed
+  properties:
+  - type: OpenAPI
+    url: openapi/bioaegis-therapeutics-o-embed-api-openapi.yml
   - type: Authentication
     url: authentication/bioaegis-therapeutics-authentication.yml
   - type: ErrorCatalog

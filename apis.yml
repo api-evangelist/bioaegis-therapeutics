@@ -55,7 +55,7 @@ created: '2026-08-07'
 modified: '2026-08-07'
 tags:
 - Company
-- biopharmaceuticals
+- Biopharmaceutical
 - Biotechnology
 - Clinical Trials
 - Immunology
@@ -302,6 +302,8 @@ apis:
   humanURL: https://developer.wordpress.org/rest-api/
   baseURL: https://www.bioaegistherapeutics.com/wp-json
   tags:
+  - oEmbed
+  tags_raw:
   - o Embed
   properties:
   - type: OpenAPI

@@ -3,7 +3,7 @@ info:
   title: BioAegis Therapeutics Content Taxonomy API
   version: wp/v2
   summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
-  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json.
   contact:
     name: BioAegis Therapeutics
     url: https://www.bioaegistherapeutics.com/contact-us/
@@ -15,13 +15,13 @@ servers:
 - url: https://www.bioaegistherapeutics.com/wp-json
   description: Production content API
 tags:
-- name: taxonomy
+- name: Taxonomy
   description: Categories and tags. The hierarchical `category` taxonomy holds 10 terms and carries all classification; the flat `post_tag` taxonomy is registered but empty (0 terms).
 paths:
   /wp/v2/categories:
     get:
       tags:
-      - taxonomy
+      - Taxonomy
       operationId: listCategories
       summary: List categories
       description: Lists terms in the hierarchical `category` taxonomy. 10 terms at harvest time — News (94), Publication (34), Event (9), Clinical (6), Leadership (5), Board (4), Feature (2), COVID19 (1), Uncategorized (1) and Jobs (0). This taxonomy is how the site segments its content; there are no post tags.
@@ -95,7 +95,7 @@ paths:
   /wp/v2/categories/{id}:
     get:
       tags:
-      - taxonomy
+      - Taxonomy
       operationId: getCategory
       summary: Get a category
       description: Retrieves a single category term by ID. ID 11 is News, the largest category.
@@ -121,7 +121,7 @@ paths:
   /wp/v2/tags:
     get:
       tags:
-      - taxonomy
+      - Taxonomy
       operationId: listTags
       summary: List tags
       description: Lists terms in the flat `post_tag` taxonomy. Registered and reachable, but empty (X-WP-Total 0) — BioAegis classifies exclusively with categories.
@@ -144,19 +144,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/Term'
 components:
-  headers:
-    XWPTotalPages:
-      description: Total number of pages available at the requested page size.
-      schema:
-        type: integer
-        examples:
-        - 153
-    XWPTotal:
-      description: Total number of items in the collection.
-      schema:
-        type: integer
-        examples:
-        - 153
   responses:
     InvalidParam:
       description: A query parameter failed validation.
@@ -187,25 +174,6 @@ components:
                 data:
                   status: 404
   parameters:
-    PerPage:
-      name: per_page
-      in: query
-      description: Maximum number of items to be returned in the result set.
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 10
-    Exclude:
-      name: exclude
-      in: query
-      description: Ensure result set excludes specific IDs.
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
     Context:
       name: context
       in: query
@@ -217,6 +185,15 @@ components:
         - embed
         - edit
         default: view
+    PerPage:
+      name: per_page
+      in: query
+      description: Maximum number of items to be returned in the result set.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
     Page:
       name: page
       in: query
@@ -225,6 +202,36 @@ components:
         type: integer
         minimum: 1
         default: 1
+    Fields:
+      name: _fields
+      in: query
+      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
+      schema:
+        type: string
+        examples:
+        - id,slug,title,link,date,modified
+      style: form
+      explode: false
+    Exclude:
+      name: exclude
+      in: query
+      description: Ensure result set excludes specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Include:
+      name: include
+      in: query
+      description: Limit result set to specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
     Search:
       name: search
       in: query
@@ -241,27 +248,50 @@ components:
         - asc
         - desc
         default: desc
-    Fields:
-      name: _fields
-      in: query
-      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
+  headers:
+    XWPTotal:
+      description: Total number of items in the collection.
       schema:
-        type: string
+        type: integer
         examples:
-        - id,slug,title,link,date,modified
-      style: form
-      explode: false
-    Include:
-      name: include
-      in: query
-      description: Limit result set to specific IDs.
+        - 153
+    XWPTotalPages:
+      description: Total number of pages available at the requested page size.
       schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
+        type: integer
+        examples:
+        - 153
   schemas:
+    RestError:
+      type: object
+      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
+      required:
+      - code
+      - message
+      - data
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples:
+          - rest_post_invalid_id
+        message:
+          type: string
+          description: Human-readable message.
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code, repeated in the body.
+            params:
+              type: object
+              description: Per-parameter validation messages, present on rest_invalid_param.
+              additionalProperties:
+                type: string
+            details:
+              type: object
+              description: Per-parameter structured validation detail, present on rest_invalid_param.
     Term:
       type: object
       description: A taxonomy term.
@@ -297,33 +327,3 @@ components:
           type: object
         _links:
           type: object
-    RestError:
-      type: object
-      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
-      required:
-      - code
-      - message
-      - data
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code.
-          examples:
-          - rest_post_invalid_id
-        message:
-          type: string
-          description: Human-readable message.
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-              description: HTTP status code, repeated in the body.
-            params:
-              type: object
-              description: Per-parameter validation messages, present on rest_invalid_param.
-              additionalProperties:
-                type: string
-            details:
-              type: object
-              description: Per-parameter structured validation detail, present on rest_invalid_param.

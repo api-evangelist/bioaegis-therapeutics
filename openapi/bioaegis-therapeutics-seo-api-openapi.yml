@@ -3,7 +3,7 @@ info:
   title: BioAegis Therapeutics Content Seo API
   version: wp/v2
   summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
-  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json.
   contact:
     name: BioAegis Therapeutics
     url: https://www.bioaegistherapeutics.com/contact-us/
@@ -15,13 +15,13 @@ servers:
 - url: https://www.bioaegistherapeutics.com/wp-json
   description: Production content API
 tags:
-- name: seo
+- name: SEO
   description: Yoast SEO head-tag rendering for a bioaegistherapeutics.com URL — the only anonymously readable operation in the yoast/v1 namespace, and the carrier of the site's schema.org JSON-LD graph.
 paths:
   /yoast/v1/get_head:
     get:
       tags:
-      - seo
+      - SEO
       operationId: getYoastHead
       summary: Get the rendered SEO head for a URL
       description: Renders the Yoast SEO head for a bioaegistherapeutics.com URL, returning both the raw HTML (`html`) and a parsed object (`json`). The parsed object carries the canonical URL, robots directives, Open Graph and Twitter card metadata, and — under `json.schema['@graph']` — the site's schema.org JSON-LD graph (WebPage, BreadcrumbList, WebSite, Organization). This is the richest structured-data source on the surface and the only anonymously readable operation in the 53-route `yoast/v1` namespace.

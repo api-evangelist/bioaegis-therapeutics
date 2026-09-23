@@ -1,16 +1,7 @@
 {
   "provider": "bioaegis-therapeutics",
   "sources": [
-    "bioaegis-therapeutics-blocks-api-openapi.yml",
-    "bioaegis-therapeutics-comments-api-openapi.yml",
-    "bioaegis-therapeutics-discovery-api-openapi.yml",
-    "bioaegis-therapeutics-media-api-openapi.yml",
-    "bioaegis-therapeutics-oembed-api-openapi.yml",
-    "bioaegis-therapeutics-pages-api-openapi.yml",
-    "bioaegis-therapeutics-posts-api-openapi.yml",
-    "bioaegis-therapeutics-search-api-openapi.yml",
-    "bioaegis-therapeutics-seo-api-openapi.yml",
-    "bioaegis-therapeutics-taxonomy-api-openapi.yml"
+    "_original/bioaegis-therapeutics-content-openapi.yml"
   ],
   "outputs": [
     "bioaegis-therapeutics-blocks-api-openapi.yml",
@@ -24,21 +15,27 @@
     "bioaegis-therapeutics-seo-api-openapi.yml",
     "bioaegis-therapeutics-taxonomy-api-openapi.yml"
   ],
-  "archived": [],
+  "archived": [
+    "deleted 1 superseded output(s) from the previous generation"
+  ],
   "errors": [],
   "warnings": [],
   "notes": [
-    "bioaegis-therapeutics-blocks-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-comments-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-discovery-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-media-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-oembed-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-pages-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-posts-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-search-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-seo-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "bioaegis-therapeutics-taxonomy-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "apis.yml register: already-registered"
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "bioaegis-therapeutics-content-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "superseded outputs removed: bioaegis-therapeutics-o-embed-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 10 total)"
   ],
-  "skipped": []
+  "skipped": [
+    "bioaegis-therapeutics-blocks-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-comments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-discovery-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-media-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-o-embed-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-pages-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-posts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-search-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-seo-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bioaegis-therapeutics-taxonomy-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

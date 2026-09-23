@@ -3,7 +3,7 @@ info:
   title: BioAegis Therapeutics Content Pages API
   version: wp/v2
   summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
-  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json.
   contact:
     name: BioAegis Therapeutics
     url: https://www.bioaegistherapeutics.com/contact-us/
@@ -15,13 +15,13 @@ servers:
 - url: https://www.bioaegistherapeutics.com/wp-json
   description: Production content API
 tags:
-- name: pages
+- name: Pages
   description: Corporate pages — 14 published at harvest time (Home, About Us, Our Science, Our Platform, BTI-203 Clinical Trial, FAQs, Publications, News, Careers, Contact Us, Expanded Access Policy, Code of Ethics/Conduct, Terms of Use, Privacy Policy).
 paths:
   /wp/v2/pages:
     get:
       tags:
-      - pages
+      - Pages
       operationId: listPages
       summary: List pages
       description: Lists published pages. 14 items at harvest time. `content.rendered` is populated and can be large — the Our Platform page returns ~100KB of rendered Elementor markup.
@@ -101,7 +101,7 @@ paths:
   /wp/v2/pages/{id}:
     get:
       tags:
-      - pages
+      - Pages
       operationId: getPage
       summary: Get a page
       description: Retrieves a single published page by its numeric ID.
@@ -126,7 +126,140 @@ paths:
         '404':
           $ref: '#/components/responses/InvalidPostId'
 components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Current page of the collection (1-based).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Fields:
+      name: _fields
+      in: query
+      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
+      schema:
+        type: string
+        examples:
+        - id,slug,title,link,date,modified
+      style: form
+      explode: false
+    After:
+      name: after
+      in: query
+      description: Limit response to items published after a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Context:
+      name: context
+      in: query
+      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
+      schema:
+        type: string
+        enum:
+        - view
+        - embed
+        - edit
+        default: view
+    Offset:
+      name: offset
+      in: query
+      description: Offset the result set by a specific number of items.
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      description: Maximum number of items to be returned in the result set.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Exclude:
+      name: exclude
+      in: query
+      description: Ensure result set excludes specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Search:
+      name: search
+      in: query
+      description: Limit results to those matching a string.
+      schema:
+        type: string
+    Before:
+      name: before
+      in: query
+      description: Limit response to items published before a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Include:
+      name: include
+      in: query
+      description: Limit result set to specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Order:
+      name: order
+      in: query
+      description: Order sort attribute ascending or descending.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
   schemas:
+    RenderedText:
+      type: object
+      description: A rendered-HTML text field.
+      properties:
+        rendered:
+          type: string
+        protected:
+          type: boolean
+    RestError:
+      type: object
+      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
+      required:
+      - code
+      - message
+      - data
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples:
+          - rest_post_invalid_id
+        message:
+          type: string
+          description: Human-readable message.
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code, repeated in the body.
+            params:
+              type: object
+              description: Per-parameter validation messages, present on rest_invalid_param.
+              additionalProperties:
+                type: string
+            details:
+              type: object
+              description: Per-parameter structured validation detail, present on rest_invalid_param.
     Page:
       type: object
       description: A published page. Same shape as Post, minus categories/tags/sticky/format, plus parent and menu_order.
@@ -177,51 +310,7 @@ components:
           type: object
         _links:
           type: object
-    RenderedText:
-      type: object
-      description: A rendered-HTML text field.
-      properties:
-        rendered:
-          type: string
-        protected:
-          type: boolean
-    RestError:
-      type: object
-      description: The WordPress REST error envelope. This is NOT RFC 9457 problem+json — it is served as `application/json` with a `code`/`message`/`data.status` shape, and the HTTP status is duplicated inside `data.status`.
-      required:
-      - code
-      - message
-      - data
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code.
-          examples:
-          - rest_post_invalid_id
-        message:
-          type: string
-          description: Human-readable message.
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-              description: HTTP status code, repeated in the body.
-            params:
-              type: object
-              description: Per-parameter validation messages, present on rest_invalid_param.
-              additionalProperties:
-                type: string
-            details:
-              type: object
-              description: Per-parameter structured validation detail, present on rest_invalid_param.
   headers:
-    XWPTotal:
-      description: Total number of items in the collection.
-      schema:
-        type: integer
-        examples:
-        - 153
     LinkPagination:
       description: RFC 8288 Link header carrying `prev` and `next` relations for the collection.
       schema:
@@ -232,101 +321,12 @@ components:
         type: integer
         examples:
         - 153
-  parameters:
-    Search:
-      name: search
-      in: query
-      description: Limit results to those matching a string.
+    XWPTotal:
+      description: Total number of items in the collection.
       schema:
-        type: string
-    Fields:
-      name: _fields
-      in: query
-      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
-      schema:
-        type: string
+        type: integer
         examples:
-        - id,slug,title,link,date,modified
-      style: form
-      explode: false
-    Include:
-      name: include
-      in: query
-      description: Limit result set to specific IDs.
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-    Before:
-      name: before
-      in: query
-      description: Limit response to items published before a given ISO 8601 compliant date.
-      schema:
-        type: string
-        format: date-time
-    Order:
-      name: order
-      in: query
-      description: Order sort attribute ascending or descending.
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-        default: desc
-    Exclude:
-      name: exclude
-      in: query
-      description: Ensure result set excludes specific IDs.
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-    Offset:
-      name: offset
-      in: query
-      description: Offset the result set by a specific number of items.
-      schema:
-        type: integer
-    PerPage:
-      name: per_page
-      in: query
-      description: Maximum number of items to be returned in the result set.
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 10
-    Context:
-      name: context
-      in: query
-      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
-      schema:
-        type: string
-        enum:
-        - view
-        - embed
-        - edit
-        default: view
-    Page:
-      name: page
-      in: query
-      description: Current page of the collection (1-based).
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    After:
-      name: after
-      in: query
-      description: Limit response to items published after a given ISO 8601 compliant date.
-      schema:
-        type: string
-        format: date-time
+        - 153
   responses:
     InvalidParam:
       description: A query parameter failed validation.

@@ -3,7 +3,7 @@ info:
   title: BioAegis Therapeutics Content Posts API
   version: wp/v2
   summary: Anonymously readable WordPress REST content API behind www.bioaegistherapeutics.com.
-  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json. BioAegis Therapeutics is a privately held, clinical-stage biopharmaceutical company developing recombinant human plasma gelsolin (rhu-pGSN) for acute respiratory distress syndrome (BTI-203, Phase 2) and inflammasome-driven decompression sickness; it runs no developer program and markets no product API. This document is an API Evangelist derivation of the WordPress `wp/v2`, `oembed/1.0` and `yoast/v1` route index the site publishes at /wp-json/, restricted to the operations that were verified to return data anonymously on 2026-08-07. Write operations, `/wp/v2/users`, `/wp/v2/settings`, `/wp/v2/menus`, `/wp/v2/menu-locations`, `/wp/v2/sidebars`, `/wp/v2/widget-types`, `/wp/v2/themes`, `/wp/v2/plugins`, `/wp/v2/templates`, `/wp/v2/template-parts`, `/wp/v2/global-styles`, `/wp/v2/block-types`, `/wp/v2/block-patterns`, `/wp/v2/pattern-directory`, `/wp/v2/font-collections`, every `revisions` and `autosaves` sub-resource, the `oembed/1.0/proxy` endpoint, the `wp-abilities/v1` namespace, the `wp-site-health/v1` namespace, the `wp-block-editor/v1` namespace, the `redirection/v1` namespace, the `elementor*` namespaces, the `astra/v1` namespace, the `monsterinsights/v1` namespace, the `nps-survey/v1` namespace, the `duplicate-post/v1` namespace and the authenticated half of `yoast/v1` all require authentication (or return 404/500/502 anonymously) and are deliberately excluded — see x-api-evangelist-provenance.
+  description: The read-only content surface BioAegis Therapeutics exposes at https://www.bioaegistherapeutics.com/wp-json.
   contact:
     name: BioAegis Therapeutics
     url: https://www.bioaegistherapeutics.com/contact-us/
@@ -15,13 +15,13 @@ servers:
 - url: https://www.bioaegistherapeutics.com/wp-json
   description: Production content API
 tags:
-- name: posts
+- name: Posts
   description: Post collection — 153 published items at harvest time, spanning News press releases (94), Publications (34), Events (9), Clinical advisory board profiles (6), Leadership profiles (5), Board profiles (4), Feature entries (2) and COVID19 (1).
 paths:
   /wp/v2/posts:
     get:
       tags:
-      - posts
+      - Posts
       operationId: listPosts
       summary: List posts
       description: Lists published posts, newest first. 153 items at harvest time. `content.rendered` and `excerpt.rendered` are populated, so this operation returns full press-release prose. Page size is capped at 100; total count and page count come back in `X-WP-Total` and `X-WP-TotalPages`, and `Link` carries RFC 8288 `prev`/`next` relations.
@@ -109,7 +109,7 @@ paths:
   /wp/v2/posts/{id}:
     get:
       tags:
-      - posts
+      - Posts
       operationId: getPost
       summary: Get a post
       description: Retrieves a single published post by its numeric ID.
@@ -134,6 +134,101 @@ paths:
         '404':
           $ref: '#/components/responses/InvalidPostId'
 components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Current page of the collection (1-based).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Fields:
+      name: _fields
+      in: query
+      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
+      schema:
+        type: string
+        examples:
+        - id,slug,title,link,date,modified
+      style: form
+      explode: false
+    Context:
+      name: context
+      in: query
+      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
+      schema:
+        type: string
+        enum:
+        - view
+        - embed
+        - edit
+        default: view
+    Offset:
+      name: offset
+      in: query
+      description: Offset the result set by a specific number of items.
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      description: Maximum number of items to be returned in the result set.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Exclude:
+      name: exclude
+      in: query
+      description: Ensure result set excludes specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    Search:
+      name: search
+      in: query
+      description: Limit results to those matching a string.
+      schema:
+        type: string
+    Before:
+      name: before
+      in: query
+      description: Limit response to items published before a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Include:
+      name: include
+      in: query
+      description: Limit result set to specific IDs.
+      schema:
+        type: array
+        items:
+          type: integer
+      style: form
+      explode: false
+    After:
+      name: after
+      in: query
+      description: Limit response to items published after a given ISO 8601 compliant date.
+      schema:
+        type: string
+        format: date-time
+    Order:
+      name: order
+      in: query
+      description: Order sort attribute ascending or descending.
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+        default: desc
   schemas:
     Post:
       type: object
@@ -256,12 +351,6 @@ components:
               type: object
               description: Per-parameter structured validation detail, present on rest_invalid_param.
   headers:
-    XWPTotal:
-      description: Total number of items in the collection.
-      schema:
-        type: integer
-        examples:
-        - 153
     LinkPagination:
       description: RFC 8288 Link header carrying `prev` and `next` relations for the collection.
       schema:
@@ -272,101 +361,12 @@ components:
         type: integer
         examples:
         - 153
-  parameters:
-    Search:
-      name: search
-      in: query
-      description: Limit results to those matching a string.
+    XWPTotal:
+      description: Total number of items in the collection.
       schema:
-        type: string
-    Fields:
-      name: _fields
-      in: query
-      description: Comma-separated list of fields to limit the response to. The most effective way to keep page-body responses small on this site, where `content.rendered` can exceed 100KB.
-      schema:
-        type: string
+        type: integer
         examples:
-        - id,slug,title,link,date,modified
-      style: form
-      explode: false
-    Include:
-      name: include
-      in: query
-      description: Limit result set to specific IDs.
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-    Before:
-      name: before
-      in: query
-      description: Limit response to items published before a given ISO 8601 compliant date.
-      schema:
-        type: string
-        format: date-time
-    Order:
-      name: order
-      in: query
-      description: Order sort attribute ascending or descending.
-      schema:
-        type: string
-        enum:
-        - asc
-        - desc
-        default: desc
-    Exclude:
-      name: exclude
-      in: query
-      description: Ensure result set excludes specific IDs.
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-    Offset:
-      name: offset
-      in: query
-      description: Offset the result set by a specific number of items.
-      schema:
-        type: integer
-    PerPage:
-      name: per_page
-      in: query
-      description: Maximum number of items to be returned in the result set.
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 10
-    Context:
-      name: context
-      in: query
-      description: Scope under which the request is made; determines fields present in the response. Anonymous callers may only use `view` and `embed`.
-      schema:
-        type: string
-        enum:
-        - view
-        - embed
-        - edit
-        default: view
-    Page:
-      name: page
-      in: query
-      description: Current page of the collection (1-based).
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    After:
-      name: after
-      in: query
-      description: Limit response to items published after a given ISO 8601 compliant date.
-      schema:
-        type: string
-        format: date-time
+        - 153
   responses:
     InvalidParam:
       description: A query parameter failed validation.
